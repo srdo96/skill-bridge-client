@@ -1,14 +1,11 @@
 import * as React from "react";
 
-import { SearchForm } from "@/components/search-form";
-import { VersionSwitcher } from "@/components/version-switcher";
 import {
     Sidebar,
     SidebarContent,
     SidebarGroup,
     SidebarGroupContent,
     SidebarGroupLabel,
-    SidebarHeader,
     SidebarMenu,
     SidebarMenuButton,
     SidebarMenuItem,
@@ -147,7 +144,12 @@ const data = {
     ],
 };
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+export function AppSidebar({
+    user,
+    ...props
+}: {
+    user: { role: string } & React.ComponentProps<typeof Sidebar>;
+}) {
     return (
         <Sidebar {...props}>
             <SidebarContent>
