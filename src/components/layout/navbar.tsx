@@ -4,20 +4,14 @@ import { Menu } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
-import {
-    Accordion,
-    AccordionContent,
-    AccordionItem,
-    AccordionTrigger,
-} from "@/components/ui/accordion";
+import { Accordion } from "@/components/ui/accordion";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
     NavigationMenu,
-    NavigationMenuContent,
     NavigationMenuItem,
     NavigationMenuLink,
     NavigationMenuList,
-    NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu";
 import {
     Sheet,
@@ -26,6 +20,7 @@ import {
     SheetTitle,
     SheetTrigger,
 } from "@/components/ui/sheet";
+import { authClient } from "@/lib/auth-client";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -35,6 +30,7 @@ interface MenuItem {
     description?: string;
     icon?: React.ReactNode;
     items?: MenuItem[];
+    requiresAuth?: boolean;
 }
 
 interface Navbar1Props {
@@ -77,8 +73,9 @@ const Navbar = ({
             url: "/subjects",
         },
         {
-            title: "About",
-            url: "/about",
+            title: "Dashboard",
+            url: "/dashboard",
+            requiresAuth: true,
         },
     ],
     auth = {
@@ -87,6 +84,15 @@ const Navbar = ({
     },
     className,
 }: Navbar1Props) => {
+    const { data: session } = authClient.useSession();
+
+    const handleLogout = async () => {
+        await authClient.signOut();
+    };
+
+    // Filter menu items based on auth state
+    const filteredMenu = menu.filter((item) => !item.requiresAuth || session);
+
     return (
         <section className={cn("py-4", className)}>
             <div className="container">
@@ -109,18 +115,72 @@ const Navbar = ({
                         <div className="flex items-center">
                             <NavigationMenu>
                                 <NavigationMenuList>
-                                    {menu.map((item) => renderMenuItem(item))}
+                                    {filteredMenu.map((item) =>
+                                        renderMenuItem(item),
+                                    )}
                                 </NavigationMenuList>
                             </NavigationMenu>
                         </div>
                     </div>
-                    <div className="flex gap-2">
-                        <Button asChild variant="outline" size="sm">
-                            <a href={auth.login.url}>{auth.login.title}</a>
-                        </Button>
-                        <Button asChild size="sm">
-                            <a href={auth.signup.url}>{auth.signup.title}</a>
-                        </Button>
+                    <div className="flex items-center gap-3">
+                        {session ? (
+                            <>
+                                <div className="flex items-center gap-2">
+                                    <Avatar className="size-8">
+                                        <AvatarImage
+                                            src={
+                                                session.user.image || undefined
+                                            }
+                                            alt={session.user.name}
+                                        />
+                                        <AvatarFallback>
+                                            {session.user.name
+                                                ?.split(" ")
+                                                .map((n) => n[0])
+                                                .join("")
+                                                .toUpperCase() || "U"}
+                                        </AvatarFallback>
+                                    </Avatar>
+                                    <div className="flex flex-col">
+                                        <span className="text-sm font-medium">
+                                            {session.user.name}
+                                        </span>
+                                        {(session.user as { role?: string })
+                                            .role && (
+                                            <span className="text-xs text-muted-foreground capitalize">
+                                                {
+                                                    (
+                                                        session.user as {
+                                                            role?: string;
+                                                        }
+                                                    ).role
+                                                }
+                                            </span>
+                                        )}
+                                    </div>
+                                </div>
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={handleLogout}
+                                >
+                                    Logout
+                                </Button>
+                            </>
+                        ) : (
+                            <>
+                                <Button asChild variant="outline" size="sm">
+                                    <Link href={auth.login.url}>
+                                        {auth.login.title}
+                                    </Link>
+                                </Button>
+                                <Button asChild size="sm">
+                                    <Link href={auth.signup.url}>
+                                        {auth.signup.title}
+                                    </Link>
+                                </Button>
+                            </>
+                        )}
                     </div>
                 </nav>
 
@@ -128,13 +188,16 @@ const Navbar = ({
                 <div className="block lg:hidden">
                     <div className="flex items-center justify-between">
                         {/* Logo */}
-                        <a href={logo.url} className="flex items-center gap-2">
+                        <Link
+                            href={logo.url}
+                            className="flex items-center gap-2"
+                        >
                             <img
                                 src={logo.src}
                                 className="max-h-8 dark:invert"
                                 alt={logo.alt}
                             />
-                        </a>
+                        </Link>
                         <Sheet>
                             <SheetTrigger asChild>
                                 <Button variant="outline" size="icon">
@@ -144,7 +207,7 @@ const Navbar = ({
                             <SheetContent className="overflow-y-auto">
                                 <SheetHeader>
                                     <SheetTitle>
-                                        <a
+                                        <Link
                                             href={logo.url}
                                             className="flex items-center gap-2"
                                         >
@@ -153,7 +216,7 @@ const Navbar = ({
                                                 className="max-h-8 dark:invert"
                                                 alt={logo.alt}
                                             />
-                                        </a>
+                                        </Link>
                                     </SheetTitle>
                                 </SheetHeader>
                                 <div className="flex flex-col gap-6 p-4">
@@ -162,22 +225,88 @@ const Navbar = ({
                                         collapsible
                                         className="flex w-full flex-col gap-4"
                                     >
-                                        {menu.map((item) =>
+                                        {filteredMenu.map((item) =>
                                             renderMobileMenuItem(item),
                                         )}
                                     </Accordion>
 
                                     <div className="flex flex-col gap-3">
-                                        <Button asChild variant="outline">
-                                            <a href={auth.login.url}>
-                                                {auth.login.title}
-                                            </a>
-                                        </Button>
-                                        <Button asChild>
-                                            <a href={auth.signup.url}>
-                                                {auth.signup.title}
-                                            </a>
-                                        </Button>
+                                        {session ? (
+                                            <>
+                                                <div className="flex items-center gap-3 py-2">
+                                                    <Avatar className="size-10">
+                                                        <AvatarImage
+                                                            src={
+                                                                session.user
+                                                                    .image ||
+                                                                undefined
+                                                            }
+                                                            alt={
+                                                                session.user
+                                                                    .name
+                                                            }
+                                                        />
+                                                        <AvatarFallback>
+                                                            {session.user.name
+                                                                ?.split(" ")
+                                                                .map(
+                                                                    (n) => n[0],
+                                                                )
+                                                                .join("")
+                                                                .toUpperCase() ||
+                                                                "U"}
+                                                        </AvatarFallback>
+                                                    </Avatar>
+                                                    <div className="flex flex-col">
+                                                        <span className="text-sm font-medium">
+                                                            {session.user.name}
+                                                        </span>
+                                                        <span className="text-xs text-muted-foreground">
+                                                            {session.user.email}
+                                                        </span>
+                                                        {(
+                                                            session.user as {
+                                                                role?: string;
+                                                            }
+                                                        ).role && (
+                                                            <span className="text-xs font-medium text-primary capitalize">
+                                                                {
+                                                                    (
+                                                                        session.user as {
+                                                                            role?: string;
+                                                                        }
+                                                                    ).role
+                                                                }
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                                <Button
+                                                    variant="outline"
+                                                    onClick={handleLogout}
+                                                >
+                                                    Logout
+                                                </Button>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <Button
+                                                    asChild
+                                                    variant="outline"
+                                                >
+                                                    <Link href={auth.login.url}>
+                                                        {auth.login.title}
+                                                    </Link>
+                                                </Button>
+                                                <Button asChild>
+                                                    <Link
+                                                        href={auth.signup.url}
+                                                    >
+                                                        {auth.signup.title}
+                                                    </Link>
+                                                </Button>
+                                            </>
+                                        )}
                                     </div>
                                 </div>
                             </SheetContent>
@@ -190,25 +319,6 @@ const Navbar = ({
 };
 
 const renderMenuItem = (item: MenuItem) => {
-    if (item.items) {
-        return (
-            <NavigationMenuItem key={item.title}>
-                <NavigationMenuTrigger>{item.title}</NavigationMenuTrigger>
-                <NavigationMenuContent className="bg-popover text-popover-foreground">
-                    {item.items.map((subItem) => (
-                        <NavigationMenuLink
-                            asChild
-                            key={subItem.title}
-                            className="w-80"
-                        >
-                            <SubMenuLink item={subItem} />
-                        </NavigationMenuLink>
-                    ))}
-                </NavigationMenuContent>
-            </NavigationMenuItem>
-        );
-    }
-
     return (
         <NavigationMenuItem key={item.title}>
             <NavigationMenuLink
@@ -222,48 +332,14 @@ const renderMenuItem = (item: MenuItem) => {
 };
 
 const renderMobileMenuItem = (item: MenuItem) => {
-    if (item.items) {
-        return (
-            <AccordionItem
-                key={item.title}
-                value={item.title}
-                className="border-b-0"
-            >
-                <AccordionTrigger className="text-md py-0 font-semibold hover:no-underline">
-                    {item.title}
-                </AccordionTrigger>
-                <AccordionContent className="mt-2">
-                    {item.items.map((subItem) => (
-                        <SubMenuLink key={subItem.title} item={subItem} />
-                    ))}
-                </AccordionContent>
-            </AccordionItem>
-        );
-    }
-
     return (
-        <a key={item.title} href={item.url} className="text-md font-semibold">
-            {item.title}
-        </a>
-    );
-};
-
-const SubMenuLink = ({ item }: { item: MenuItem }) => {
-    return (
-        <a
-            className="flex min-w-80 flex-row gap-4 rounded-md p-3 leading-none no-underline transition-colors outline-none select-none hover:bg-muted hover:text-accent-foreground"
+        <Link
+            key={item.title}
             href={item.url}
+            className="text-md font-semibold hover:text-primary"
         >
-            <div className="text-foreground">{item.icon}</div>
-            <div>
-                <div className="text-sm font-semibold">{item.title}</div>
-                {item.description && (
-                    <p className="text-sm leading-snug text-muted-foreground">
-                        {item.description}
-                    </p>
-                )}
-            </div>
-        </a>
+            {item.title}
+        </Link>
     );
 };
 
