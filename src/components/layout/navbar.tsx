@@ -67,14 +67,14 @@ const Navbar = ({
         title: "SkillBridge",
     },
     menu = [
-        { title: "Home", url: "#" },
-        {
-            title: "Subjects",
-            url: "/subjects",
-        },
+        { title: "Home", url: "/" },
         {
             title: "Tutors",
             url: "/tutors",
+        },
+        {
+            title: "Subjects",
+            url: "/subjects",
         },
         {
             title: "About",
