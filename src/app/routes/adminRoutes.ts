@@ -1,7 +1,5 @@
-import React from 'react'
+import { Route } from "../types";
 
-export default function adminRoutes() {
-  return (
-    <div>adminRoutes</div>
-  )
-}
+export const adminRoutes: Route[] = [
+    { title: "User Management", items: [{ title: "Users", url: "/users" }] },
+];
