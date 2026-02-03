@@ -27,6 +27,7 @@ import {
     SheetTrigger,
 } from "@/components/ui/sheet";
 import Image from "next/image";
+import Link from "next/link";
 
 interface MenuItem {
     title: string;
@@ -93,7 +94,7 @@ const Navbar = ({
                 <nav className="hidden items-center justify-between lg:flex">
                     <div className="flex items-center gap-6">
                         {/* Logo */}
-                        <a href={logo.url} className="flex items-center gap-2">
+                        <Link href="/" className="flex items-center gap-2">
                             <Image
                                 src={logo.src}
                                 width={32}
@@ -104,7 +105,7 @@ const Navbar = ({
                             <span className="text-lg font-semibold tracking-tighter">
                                 {logo.title}
                             </span>
-                        </a>
+                        </Link>
                         <div className="flex items-center">
                             <NavigationMenu>
                                 <NavigationMenuList>
