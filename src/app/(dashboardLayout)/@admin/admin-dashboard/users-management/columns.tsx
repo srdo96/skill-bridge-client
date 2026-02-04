@@ -4,9 +4,21 @@ import { ColumnDef } from "@tanstack/react-table";
 import { BanIcon, EyeIcon } from "lucide-react";
 import Link from "next/link";
 
+import { banUser } from "@/actions/user.action";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { User, UserRoles, UserStatus } from "@/types";
+import { toast } from "sonner";
+
+const handleBanUser = async (id: string) => {
+    const result = await banUser(id);
+    if (result?.error) {
+        toast.error(result.error.message);
+    }
+    if (result?.data) {
+        toast.success("User banned successfully");
+    }
+};
 
 export const columns: ColumnDef<User>[] = [
     {
@@ -62,7 +74,11 @@ export const columns: ColumnDef<User>[] = [
                             View
                         </Link>
                     </Button>
-                    <Button variant="outline" size="sm">
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={async () => handleBanUser(user.id)}
+                    >
                         <BanIcon className="w-4 h-4 mr-1" />
                         {user.status === UserStatus.ACTIVE ? "Ban" : "Unban"}
                     </Button>

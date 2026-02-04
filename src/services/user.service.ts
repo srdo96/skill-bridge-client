@@ -57,4 +57,46 @@ export const userService = {
             return { data: null, error: { message: "Something went wrong" } };
         }
     },
+
+    banUser: async function (id: string) {
+        try {
+            console.log("banUser", id);
+            const cookieStore = await cookies();
+            const res = await fetch(`${BACKEND_URL}/api/v1/users/${id}/ban`, {
+                method: "PATCH",
+                headers: { Cookie: cookieStore.toString() },
+                cache: "no-cache",
+            });
+            console.log("res", res);
+            if (!res.ok) {
+                return { data: null, error: { message: "Failed to ban user" } };
+            }
+
+            const data = await res.json();
+            return { data, error: null };
+        } catch (error) {
+            return { data: null, error: { message: "Something went wrong" } };
+        }
+    },
+    unbanUser: async function (id: string) {
+        try {
+            const cookieStore = await cookies();
+            const res = await fetch(`${BACKEND_URL}/api/v1/users/${id}/unban`, {
+                method: "PATCH",
+                headers: { Cookie: cookieStore.toString() },
+                cache: "no-cache",
+            });
+            if (!res.ok) {
+                return {
+                    data: null,
+                    error: { message: "Failed to unban user" },
+                };
+            }
+
+            const data = await res.json();
+            return { data, error: null };
+        } catch (error) {
+            return { data: null, error: { message: "Something went wrong" } };
+        }
+    },
 };

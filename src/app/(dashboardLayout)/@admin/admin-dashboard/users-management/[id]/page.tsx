@@ -2,13 +2,19 @@ import {
     ArrowLeft,
     BadgeCheck,
     Ban,
+    BookOpen,
     Calendar,
+    CalendarDays,
+    CheckCircle,
     Clock,
     DollarSign,
+    ExternalLink,
     Mail,
+    MessageSquare,
     Phone,
     Shield,
     Star,
+    XCircle,
 } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -25,7 +31,17 @@ import {
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { userService } from "@/services/user.service";
-import { User, UserRoles, UserStatus } from "@/types";
+import {
+    Availability,
+    Booking,
+    BookingStatus,
+    Days,
+    Review,
+    TutorSubject,
+    User,
+    UserRoles,
+    UserStatus,
+} from "@/types";
 
 interface UserDetailsPageProps {
     params: Promise<{ id: string }>;
@@ -87,14 +103,14 @@ export default async function UserDetailsPage({
 }: UserDetailsPageProps) {
     const { id } = await params;
     const user = await getUserData(id);
-
+    console.log(user);
     if (!user) {
         notFound();
     }
 
     const isTutor = user.role === UserRoles.TUTOR;
     const tutorProfile = user.tutorProfiles;
-
+    console.log({ tutorProfile });
     return (
         <div className="container mx-auto py-6 space-y-6">
             {/* Back Button */}
@@ -253,6 +269,93 @@ export default async function UserDetailsPage({
                         </CardContent>
                     </Card>
                 )}
+
+                {/* Tutor Subjects Card (only for tutors with subjects) */}
+                {isTutor &&
+                    tutorProfile?.tutorSubjects &&
+                    tutorProfile.tutorSubjects.length > 0 && (
+                        <Card className="md:col-span-3">
+                            <CardHeader>
+                                <CardTitle className="flex items-center gap-2">
+                                    <BookOpen className="h-5 w-5 text-indigo-500" />
+                                    Teaching Subjects
+                                </CardTitle>
+                                <CardDescription>
+                                    Subjects this tutor teaches
+                                </CardDescription>
+                            </CardHeader>
+                            <CardContent>
+                                <SubjectsList
+                                    subjects={tutorProfile.tutorSubjects}
+                                />
+                            </CardContent>
+                        </Card>
+                    )}
+
+                {/* Availability Card (only for tutors with availability) */}
+                {isTutor &&
+                    tutorProfile?.availabilities &&
+                    tutorProfile.availabilities.length > 0 && (
+                        <Card className="md:col-span-3">
+                            <CardHeader>
+                                <CardTitle className="flex items-center gap-2">
+                                    <CalendarDays className="h-5 w-5 text-blue-500" />
+                                    Weekly Availability
+                                </CardTitle>
+                                <CardDescription>
+                                    Tutor&apos;s available time slots for each
+                                    day
+                                </CardDescription>
+                            </CardHeader>
+                            <CardContent>
+                                <AvailabilitySchedule
+                                    availabilities={tutorProfile.availabilities}
+                                />
+                            </CardContent>
+                        </Card>
+                    )}
+
+                {/* Reviews Card (only for tutors with reviews) */}
+                {isTutor &&
+                    tutorProfile?.reviews &&
+                    tutorProfile.reviews.length > 0 && (
+                        <Card className="md:col-span-3">
+                            <CardHeader>
+                                <CardTitle className="flex items-center gap-2">
+                                    <MessageSquare className="h-5 w-5 text-amber-500" />
+                                    Reviews ({tutorProfile.reviews.length})
+                                </CardTitle>
+                                <CardDescription>
+                                    Student reviews and ratings
+                                </CardDescription>
+                            </CardHeader>
+                            <CardContent>
+                                <ReviewsList reviews={tutorProfile.reviews} />
+                            </CardContent>
+                        </Card>
+                    )}
+
+                {/* Bookings Card (only for tutors with bookings) */}
+                {isTutor &&
+                    tutorProfile?.bookings &&
+                    tutorProfile.bookings.length > 0 && (
+                        <Card className="md:col-span-3">
+                            <CardHeader>
+                                <CardTitle className="flex items-center gap-2">
+                                    <Calendar className="h-5 w-5 text-teal-500" />
+                                    Bookings ({tutorProfile.bookings.length})
+                                </CardTitle>
+                                <CardDescription>
+                                    Tutor&apos;s booking history
+                                </CardDescription>
+                            </CardHeader>
+                            <CardContent>
+                                <BookingsList
+                                    bookings={tutorProfile.bookings}
+                                />
+                            </CardContent>
+                        </Card>
+                    )}
             </div>
         </div>
     );
@@ -300,6 +403,340 @@ function StatCard({
                 </p>
                 <p className="text-lg font-semibold">{value}</p>
             </div>
+        </div>
+    );
+}
+
+// Day order for sorting
+const DAY_ORDER: Days[] = [
+    Days.SATURDAY,
+    Days.SUNDAY,
+    Days.MONDAY,
+    Days.TUESDAY,
+    Days.WEDNESDAY,
+    Days.THURSDAY,
+    Days.FRIDAY,
+];
+
+function formatTime(time: string): string {
+    // Handle both "HH:mm" and "HH:mm:ss" formats
+    const [hours, minutes] = time.split(":");
+    const hour = parseInt(hours, 10);
+    const ampm = hour >= 12 ? "PM" : "AM";
+    const formattedHour = hour % 12 || 12;
+    return `${formattedHour}:${minutes} ${ampm}`;
+}
+
+function getDayColor(day: Days): string {
+    const colors: Record<Days, string> = {
+        [Days.SATURDAY]:
+            "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200",
+        [Days.SUNDAY]:
+            "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200",
+        [Days.MONDAY]:
+            "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200",
+        [Days.TUESDAY]:
+            "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
+        [Days.WEDNESDAY]:
+            "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200",
+        [Days.THURSDAY]:
+            "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200",
+        [Days.FRIDAY]:
+            "bg-pink-100 text-pink-800 dark:bg-pink-900 dark:text-pink-200",
+    };
+    return colors[day];
+}
+
+function AvailabilitySchedule({
+    availabilities,
+}: {
+    availabilities: Availability[];
+}) {
+    // Group availabilities by day
+    const groupedByDay = availabilities.reduce(
+        (acc, availability) => {
+            const day = availability.day_of_week;
+            if (!acc[day]) {
+                acc[day] = [];
+            }
+            acc[day].push(availability);
+            return acc;
+        },
+        {} as Record<Days, Availability[]>,
+    );
+
+    // Sort time slots within each day
+    Object.keys(groupedByDay).forEach((day) => {
+        groupedByDay[day as Days].sort((a, b) =>
+            a.start_time.localeCompare(b.start_time),
+        );
+    });
+
+    return (
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {DAY_ORDER.map((day) => {
+                const slots = groupedByDay[day];
+                if (!slots || slots.length === 0) return null;
+
+                return (
+                    <div key={day} className="rounded-lg border p-4 space-y-3">
+                        <div className="flex items-center gap-2">
+                            <Badge
+                                className={getDayColor(day)}
+                                variant="outline"
+                            >
+                                {day.charAt(0) + day.slice(1).toLowerCase()}
+                            </Badge>
+                        </div>
+                        <div className="space-y-2">
+                            {slots.map((slot) => (
+                                <div
+                                    key={slot.availability_id}
+                                    className="flex items-center gap-2 text-sm"
+                                >
+                                    <Clock className="h-3.5 w-3.5 text-muted-foreground" />
+                                    <span>
+                                        {formatTime(slot.start_time)} -{" "}
+                                        {formatTime(slot.end_time)}
+                                    </span>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                );
+            })}
+        </div>
+    );
+}
+
+function SubjectsList({ subjects }: { subjects: TutorSubject[] }) {
+    return (
+        <div className="flex flex-wrap gap-2">
+            {subjects.map((tutorSubject) => (
+                <Badge
+                    key={tutorSubject.subject_id}
+                    variant="secondary"
+                    className="px-3 py-1 text-sm"
+                >
+                    <BookOpen className="mr-1.5 h-3.5 w-3.5" />
+                    {tutorSubject?.subject?.name}
+                </Badge>
+            ))}
+        </div>
+    );
+}
+
+function StarRating({ rating }: { rating: number }) {
+    return (
+        <div className="flex items-center gap-0.5">
+            {[1, 2, 3, 4, 5].map((star) => (
+                <Star
+                    key={star}
+                    className={`h-4 w-4 ${
+                        star <= rating
+                            ? "fill-yellow-400 text-yellow-400"
+                            : "text-gray-300"
+                    }`}
+                />
+            ))}
+        </div>
+    );
+}
+
+function ReviewsList({ reviews }: { reviews: Review[] }) {
+    // Sort reviews by date (newest first)
+    const sortedReviews = [...reviews].sort(
+        (a, b) =>
+            new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
+    );
+
+    return (
+        <div className="space-y-4">
+            {sortedReviews.map((review) => (
+                <div
+                    key={review.review_id}
+                    className="rounded-lg border p-4 space-y-3"
+                >
+                    <div className="flex items-start justify-between">
+                        <div className="flex items-center gap-3">
+                            <Avatar className="h-10 w-10">
+                                <AvatarImage
+                                    src={review.student?.image || undefined}
+                                    alt={review.student?.name || "Student"}
+                                />
+                                <AvatarFallback>
+                                    {review.student?.name
+                                        ?.split(" ")
+                                        .map((n) => n[0])
+                                        .join("")
+                                        .toUpperCase()
+                                        .slice(0, 2) || "ST"}
+                                </AvatarFallback>
+                            </Avatar>
+                            <div>
+                                <p className="font-medium">
+                                    {review.student?.name ||
+                                        "Anonymous Student"}
+                                </p>
+                                <p className="text-xs text-muted-foreground">
+                                    {new Date(
+                                        review.created_at,
+                                    ).toLocaleDateString("en-US", {
+                                        year: "numeric",
+                                        month: "short",
+                                        day: "numeric",
+                                    })}
+                                </p>
+                            </div>
+                        </div>
+                        <StarRating rating={review.rating} />
+                    </div>
+                    {review.comment && (
+                        <p className="text-sm text-muted-foreground">
+                            {review.comment}
+                        </p>
+                    )}
+                </div>
+            ))}
+        </div>
+    );
+}
+
+function getBookingStatusVariant(status: BookingStatus) {
+    switch (status) {
+        case BookingStatus.CONFIRMED:
+            return "default";
+        case BookingStatus.COMPLETED:
+            return "success";
+        case BookingStatus.CANCELLED:
+            return "destructive";
+        default:
+            return "outline";
+    }
+}
+
+function getBookingStatusIcon(status: BookingStatus) {
+    switch (status) {
+        case BookingStatus.CONFIRMED:
+            return <Clock className="mr-1 h-3 w-3" />;
+        case BookingStatus.COMPLETED:
+            return <CheckCircle className="mr-1 h-3 w-3" />;
+        case BookingStatus.CANCELLED:
+            return <XCircle className="mr-1 h-3 w-3" />;
+        default:
+            return null;
+    }
+}
+
+function BookingsList({ bookings }: { bookings: Booking[] }) {
+    // Sort bookings by date (newest first)
+    const sortedBookings = [...bookings].sort(
+        (a, b) =>
+            new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
+    );
+
+    return (
+        <div className="space-y-4">
+            {sortedBookings.map((booking) => (
+                <div
+                    key={booking.booking_id}
+                    className="rounded-lg border p-4 space-y-3"
+                >
+                    <div className="flex items-start justify-between flex-wrap gap-2">
+                        <div className="flex items-center gap-3">
+                            <Avatar className="h-10 w-10">
+                                <AvatarImage
+                                    src={booking.student?.image || undefined}
+                                    alt={booking.student?.name || "Student"}
+                                />
+                                <AvatarFallback>
+                                    {booking.student?.name
+                                        ?.split(" ")
+                                        .map((n) => n[0])
+                                        .join("")
+                                        .toUpperCase()
+                                        .slice(0, 2) || "ST"}
+                                </AvatarFallback>
+                            </Avatar>
+                            <div>
+                                <p className="font-medium">
+                                    {booking.student?.name || "Student"}
+                                </p>
+                                <p className="text-xs text-muted-foreground">
+                                    {booking.student?.email}
+                                </p>
+                            </div>
+                        </div>
+                        <Badge
+                            variant={getBookingStatusVariant(booking.status)}
+                        >
+                            {getBookingStatusIcon(booking.status)}
+                            {booking.status}
+                        </Badge>
+                    </div>
+
+                    <Separator />
+
+                    <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4 text-sm">
+                        <div className="flex items-center gap-2">
+                            <BookOpen className="h-4 w-4 text-muted-foreground" />
+                            <span>
+                                {booking.subject?.name || "Subject N/A"}
+                            </span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <Badge
+                                className={getDayColor(booking.day_of_week)}
+                                variant="outline"
+                            >
+                                {booking.day_of_week.charAt(0) +
+                                    booking.day_of_week.slice(1).toLowerCase()}
+                            </Badge>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <Clock className="h-4 w-4 text-muted-foreground" />
+                            <span>
+                                {formatTime(booking.start_time)} -{" "}
+                                {formatTime(booking.end_time)}
+                            </span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <DollarSign className="h-4 w-4 text-green-500" />
+                            <span className="font-semibold">
+                                ${Number(booking.price).toFixed(2)}
+                            </span>
+                        </div>
+                    </div>
+
+                    {booking.meeting_link && (
+                        <div className="flex items-center gap-2 text-sm">
+                            <ExternalLink className="h-4 w-4 text-muted-foreground" />
+                            <a
+                                href={booking.meeting_link}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-blue-500 hover:underline truncate"
+                            >
+                                {booking.meeting_link}
+                            </a>
+                        </div>
+                    )}
+
+                    <div className="text-xs text-muted-foreground">
+                        Booked on:{" "}
+                        {new Date(booking.created_at).toLocaleDateString(
+                            "en-US",
+                            {
+                                year: "numeric",
+                                month: "short",
+                                day: "numeric",
+                                hour: "2-digit",
+                                minute: "2-digit",
+                            },
+                        )}
+                    </div>
+                </div>
+            ))}
         </div>
     );
 }
