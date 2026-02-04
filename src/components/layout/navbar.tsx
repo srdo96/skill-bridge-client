@@ -1,8 +1,7 @@
 "use client";
 
-import { Menu } from "lucide-react";
-
 import { cn } from "@/lib/utils";
+import { Menu } from "lucide-react";
 
 import { Accordion } from "@/components/ui/accordion";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -23,6 +22,16 @@ import {
 import { authClient } from "@/lib/auth-client";
 import Image from "next/image";
 import Link from "next/link";
+import * as React from "react";
+
+/**
+ * NOTE: To avoid hydration mismatches caused by SSR/CSR differences,
+ * - Always use the same tag/component (e.g., always use <Image> for logo, never <img> mixed).
+ * - Avoid conditional external feature injection.
+ * - Avoid inline style props or attributes that mutate after hydration.
+ */
+
+// To avoid SSR/CSR logo rendering difference, consistently use <Image> everywhere for logo
 
 interface MenuItem {
     title: string;
@@ -84,6 +93,12 @@ const Navbar = ({
     },
     className,
 }: Navbar1Props) => {
+    // UseRef for avatar fallback to stabilize initial during SSR/CSR
+    const [isMounted, setIsMounted] = React.useState(false);
+    React.useEffect(() => {
+        setIsMounted(true);
+    }, []);
+
     const { data: session } = authClient.useSession();
 
     const handleLogout = async () => {
@@ -99,14 +114,23 @@ const Navbar = ({
                 {/* Desktop Menu */}
                 <nav className="hidden items-center justify-between lg:flex">
                     <div className="flex items-center gap-6">
-                        {/* Logo */}
-                        <Link href="/" className="flex items-center gap-2">
+                        {/* Logo - ensure <Image> is used everywhere, never <img> */}
+                        <Link
+                            href={logo.url}
+                            className="flex items-center gap-2"
+                        >
                             <Image
                                 src={logo.src}
                                 width={32}
                                 height={32}
                                 className="max-h-8 dark:invert"
                                 alt={logo.alt}
+                                priority
+                                /*
+                                  Do NOT set style explicitly unless needed,
+                                  let next/image and tailwind handle style.
+                                  Avoid SSR/CSR differences here.
+                                */
                             />
                             <span className="text-lg font-semibold tracking-tighter">
                                 {logo.title}
@@ -127,6 +151,7 @@ const Navbar = ({
                             <>
                                 <div className="flex items-center gap-2">
                                     <Avatar className="size-8">
+                                        {/* AvatarImage fallback MUST NEVER CHANGE between SSR/CSR. */}
                                         <AvatarImage
                                             src={
                                                 session.user.image || undefined
@@ -134,11 +159,14 @@ const Navbar = ({
                                             alt={session.user.name}
                                         />
                                         <AvatarFallback>
-                                            {session.user.name
-                                                ?.split(" ")
-                                                .map((n) => n[0])
-                                                .join("")
-                                                .toUpperCase() || "U"}
+                                            {/* Only display fallback initials if mounted on client */}
+                                            {isMounted && session.user.name
+                                                ? session.user.name
+                                                      .split(" ")
+                                                      .map((n) => n[0])
+                                                      .join("")
+                                                      .toUpperCase() || "U"
+                                                : "U"}
                                         </AvatarFallback>
                                     </Avatar>
                                     <div className="flex flex-col">
@@ -187,15 +215,18 @@ const Navbar = ({
                 {/* Mobile Menu */}
                 <div className="block lg:hidden">
                     <div className="flex items-center justify-between">
-                        {/* Logo */}
+                        {/* Logo - always use <Image> for consistency */}
                         <Link
                             href={logo.url}
                             className="flex items-center gap-2"
                         >
-                            <img
+                            <Image
                                 src={logo.src}
+                                width={32}
+                                height={32}
                                 className="max-h-8 dark:invert"
                                 alt={logo.alt}
+                                priority
                             />
                         </Link>
                         <Sheet>
@@ -211,10 +242,13 @@ const Navbar = ({
                                             href={logo.url}
                                             className="flex items-center gap-2"
                                         >
-                                            <img
+                                            <Image
                                                 src={logo.src}
+                                                width={32}
+                                                height={32}
                                                 className="max-h-8 dark:invert"
                                                 alt={logo.alt}
+                                                priority
                                             />
                                         </Link>
                                     </SheetTitle>
@@ -247,14 +281,20 @@ const Navbar = ({
                                                             }
                                                         />
                                                         <AvatarFallback>
-                                                            {session.user.name
-                                                                ?.split(" ")
-                                                                .map(
-                                                                    (n) => n[0],
-                                                                )
-                                                                .join("")
-                                                                .toUpperCase() ||
-                                                                "U"}
+                                                            {isMounted &&
+                                                            session.user.name
+                                                                ? session.user.name
+                                                                      .split(
+                                                                          " ",
+                                                                      )
+                                                                      .map(
+                                                                          (n) =>
+                                                                              n[0],
+                                                                      )
+                                                                      .join("")
+                                                                      .toUpperCase() ||
+                                                                  "U"
+                                                                : "U"}
                                                         </AvatarFallback>
                                                     </Avatar>
                                                     <div className="flex flex-col">

@@ -9,11 +9,12 @@ export const userService = {
             const cookieStore = await cookies();
 
             const res = await fetch(`${AUTH_URL}/get-session`, {
-                headers: { Cookies: cookieStore.toString() },
+                headers: { Cookie: cookieStore.toString() },
                 cache: "no-store",
             });
 
             const session = await res.json();
+            console.log(session);
             if (session === null) {
                 return { data: null, error: { message: "Session is missing" } };
             }
