@@ -1,37 +1,78 @@
 "use client";
 
 import {
-    Table,
-    TableBody,
-    TableCell,
-    TableFooter,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from "@/components/layout/table";
-import { Button } from "@/components/ui/button";
-import {
     ColumnDef,
     flexRender,
     getCoreRowModel,
     getPaginationRowModel,
     useReactTable,
 } from "@tanstack/react-table";
+import { useState } from "react";
+
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from "@/components/layout/table";
+import { Button } from "@/components/ui/button";
 
 interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[];
     data: TData[];
 }
 
+// Context to share updateData function with cells
+export type DataTableMeta<TData> = {
+    updateData: (rowIndex: number, columnId: string, value: unknown) => void;
+    updateRow: (rowIndex: number, newData: Partial<TData>) => void;
+};
+
 export function DataTable<TData, TValue>({
     columns,
-    data,
+    data: initialData,
 }: DataTableProps<TData, TValue>) {
+    const [data, setData] = useState(initialData);
+
     const table = useReactTable({
         data,
         columns,
         getCoreRowModel: getCoreRowModel(),
         getPaginationRowModel: getPaginationRowModel(),
+        meta: {
+            updateData: (
+                rowIndex: number,
+                columnId: string,
+                value: unknown,
+            ) => {
+                setData((old) =>
+                    old.map((row, index) => {
+                        if (index === rowIndex) {
+                            return {
+                                ...row,
+                                [columnId]: value,
+                            };
+                        }
+                        return row;
+                    }),
+                );
+            },
+            updateRow: (rowIndex: number, newData: Partial<TData>) => {
+                setData((old) =>
+                    old.map((row, index) => {
+                        if (index === rowIndex) {
+                            return {
+                                ...row,
+                                ...newData,
+                            };
+                        }
+                        return row;
+                    }),
+                );
+            },
+        } as DataTableMeta<TData>,
     });
 
     return (
@@ -84,27 +125,25 @@ export function DataTable<TData, TValue>({
                         </TableRow>
                     )}
                 </TableBody>
-                <TableFooter>
-                    <div className="">
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => table.previousPage()}
-                            disabled={!table.getCanPreviousPage()}
-                        >
-                            Previous
-                        </Button>
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => table.nextPage()}
-                            disabled={!table.getCanNextPage()}
-                        >
-                            Next
-                        </Button>
-                    </div>
-                </TableFooter>
             </Table>
+            <div className="flex items-center justify-end gap-2 p-4">
+                <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => table.previousPage()}
+                    disabled={!table.getCanPreviousPage()}
+                >
+                    Previous
+                </Button>
+                <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => table.nextPage()}
+                    disabled={!table.getCanNextPage()}
+                >
+                    Next
+                </Button>
+            </div>
         </div>
     );
 }
