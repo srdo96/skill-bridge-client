@@ -1,28 +1,19 @@
-// export default function UserManagement() {
-//     return (
-//         <div className="h-[calc(100vh-100px)] flex items-center justify-center">
-//             UserManagement
-//         </div>
-//     );
-// }
-
-import { columns, Payment } from "./columns";
+import { userService } from "@/services/user.service";
+import { columns } from "./columns";
 import { DataTable } from "./data-table";
 
-async function getData(): Promise<Payment[]> {
-    // Fetch data from your API here.
-    return [
-        {
-            id: "728ed52f",
-            amount: 100,
-            status: "pending",
-            email: "m@example.com",
-        },
-        // ...
-    ];
+async function getData(): Promise<any[]> {
+    const { data, error } = await userService.getAllUser();
+    console.log("API Response:", JSON.stringify(data, null, 2));
+
+    if (error) {
+        return [];
+    }
+
+    return data.data;
 }
 
-export default async function DemoPage() {
+export default async function UserManagement() {
     const data = await getData();
 
     return (

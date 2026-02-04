@@ -1,27 +1,62 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import { ColumnDef } from "@tanstack/react-table";
+import { BanIcon, EyeIcon } from "lucide-react";
+import { useRouter } from "next/navigation";
 
-// This type is used to define the shape of our data.
-// You can use a Zod schema here if you want.
-export type Payment = {
-    id: string;
-    amount: number;
-    status: "pending" | "processing" | "success" | "failed";
-    email: string;
-};
-
-export const columns: ColumnDef<Payment>[] = [
+export const columns: ColumnDef<any>[] = [
     {
-        accessorKey: "status",
-        header: "Status",
+        accessorKey: "name",
+        header: "Name",
     },
     {
         accessorKey: "email",
         header: "Email",
     },
     {
-        accessorKey: "amount",
-        header: "Amount",
+        accessorKey: "role",
+        header: "Role",
+    },
+    {
+        accessorKey: "status",
+        header: "Status",
+    },
+    {
+        accessorKey: "Action",
+        header: "Action",
+        cell: ({ row }) => {
+            const router = useRouter();
+            return (
+                <div className="flex gap-2">
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                            router.push(
+                                `/admin/admin-dashboard/users-management/${row.original.id}`,
+                            );
+                        }}
+                    >
+                        <EyeIcon className="w-4 h-4" />
+                        View
+                    </Button>
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                            router.push(
+                                `/admin/admin-dashboard/users-management/${row.original.id}`,
+                            );
+                        }}
+                    >
+                        <BanIcon className="w-4 h-4" />
+                        {row.original.status === "active"
+                            ? "Ban User"
+                            : "Unban User"}
+                    </Button>
+                </div>
+            );
+        },
     },
 ];
