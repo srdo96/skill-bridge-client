@@ -38,4 +38,23 @@ export const userService = {
             return { data: null, error: { message: "Something went wrong" } };
         }
     },
+
+    getUserById: async function (id: string) {
+        try {
+            const cookieStore = await cookies();
+            const res = await fetch(`${BACKEND_URL}/api/v1/users/${id}`, {
+                headers: { Cookie: cookieStore.toString() },
+                cache: "no-cache",
+            });
+
+            if (!res.ok) {
+                return { data: null, error: { message: "User not found" } };
+            }
+
+            const data = await res.json();
+            return { data, error: null };
+        } catch (error) {
+            return { data: null, error: { message: "Something went wrong" } };
+        }
+    },
 };
