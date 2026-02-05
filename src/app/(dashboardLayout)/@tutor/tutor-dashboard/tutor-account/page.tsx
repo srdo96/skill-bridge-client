@@ -1,7 +1,7 @@
 import { tutorProfileService } from "@/services/tutor-profile.service";
 import { userService } from "@/services/user.service";
 import { TutorProfile, User } from "@/types";
-import { AccountProfileForm } from "../tutor-profile/account-profile-form";
+import { AccountProfileForm } from "./account-profile-form";
 
 async function getProfile(): Promise<TutorProfile | null> {
     const { data, error } = await tutorProfileService.getMyTutorProfile();

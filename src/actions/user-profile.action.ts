@@ -4,12 +4,15 @@ import { revalidatePath } from "next/cache";
 
 import { userService } from "@/services/user.service";
 
-export const updateUserProfile = async (payload: {
-    name: string;
-    phone?: string;
-    image?: string;
-}) => {
-    const { data, error } = await userService.updateMyProfile(payload);
+export const updateUserProfile = async (
+    payload: {
+        name: string;
+        phone?: string;
+        image?: string;
+    },
+    user_id: string,
+) => {
+    const { data, error } = await userService.updateMyProfile(payload, user_id);
     if (error) {
         return { data: null, error };
     }

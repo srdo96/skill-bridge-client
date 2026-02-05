@@ -45,11 +45,14 @@ export function AccountProfileForm({ user }: { user: User }) {
             const toastId = toast.loading("Updating account...");
             startTransition(() => {
                 void (async () => {
-                    const result = await updateUserProfile({
-                        name: value.name.trim(),
-                        phone: value.phone?.trim() || undefined,
-                        image: value.image?.trim() || undefined,
-                    });
+                    const result = await updateUserProfile(
+                        {
+                            name: value.name.trim(),
+                            phone: value.phone?.trim() || undefined,
+                            image: value.image?.trim() || undefined,
+                        },
+                        user.id,
+                    );
 
                     if (result?.error) {
                         toast.error(result.error.message, { id: toastId });

@@ -99,14 +99,17 @@ export const userService = {
             return { data: null, error: { message: "Something went wrong" } };
         }
     },
-    updateMyProfile: async function (payload: {
-        name: string;
-        phone?: string;
-        image?: string;
-    }) {
+    updateMyProfile: async function (
+        payload: {
+            name: string;
+            phone?: string;
+            image?: string;
+        },
+        user_id: string,
+    ) {
         try {
             const cookieStore = await cookies();
-            const res = await fetch(`${BACKEND_URL}/api/v1/users/me`, {
+            const res = await fetch(`${BACKEND_URL}/api/v1/users/${user_id}`, {
                 method: "PATCH",
                 headers: {
                     Cookie: cookieStore.toString(),
