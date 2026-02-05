@@ -45,6 +45,7 @@ export function TutorProfileForm({
     initialProfile: TutorProfile | null;
 }) {
     const [isPending, startTransition] = useTransition();
+    console.log("initialProfile", initialProfile);
 
     const form = useForm({
         defaultValues: {
@@ -67,7 +68,10 @@ export function TutorProfileForm({
                     };
 
                     const result = initialProfile
-                        ? await updateTutorProfile(payload)
+                        ? await updateTutorProfile(
+                              payload,
+                              initialProfile.tutor_profile_id,
+                          )
                         : await createTutorProfile(payload);
 
                     if (result?.error) {

@@ -58,20 +58,26 @@ export const tutorProfileService = {
             return { data: null, error: { message: "Something went wrong" } };
         }
     },
-    updateTutorProfile: async function (payload: {
-        hourly_rate: number;
-        year_of_experience: number;
-    }) {
+    updateTutorProfile: async function (
+        payload: {
+            hourly_rate: number;
+            year_of_experience: number;
+        },
+        tutor_profile_id: string,
+    ) {
         try {
             const cookieStore = await cookies();
-            const res = await fetch(`${BACKEND_URL}/api/v1/tutor-profiles/me`, {
-                method: "PATCH",
-                headers: {
-                    Cookie: cookieStore.toString(),
-                    "Content-Type": "application/json",
+            const res = await fetch(
+                `${BACKEND_URL}/api/v1/tutors/profile/${tutor_profile_id}`,
+                {
+                    method: "PATCH",
+                    headers: {
+                        Cookie: cookieStore.toString(),
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(payload),
                 },
-                body: JSON.stringify(payload),
-            });
+            );
             const data = await res.json();
             if (!res.ok) {
                 return {
