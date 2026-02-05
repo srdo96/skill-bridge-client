@@ -18,6 +18,15 @@ export const createTutorProfile = async (payload: {
     return { data, error: null };
 };
 
+export const getMyTutorProfile = async () => {
+    const { data, error } = await tutorProfileService.getMyTutorProfile();
+    if (error) {
+        return { data: null, error };
+    }
+    return { data, error: null };
+    ``;
+};
+
 export const updateTutorProfile = async (
     payload: {
         hourly_rate: number;

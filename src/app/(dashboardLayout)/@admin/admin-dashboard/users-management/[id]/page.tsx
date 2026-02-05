@@ -711,14 +711,14 @@ function BookingsList({ bookings }: { bookings: Booking[] }) {
                     {booking.meeting_link && (
                         <div className="flex items-center gap-2 text-sm">
                             <ExternalLink className="h-4 w-4 text-muted-foreground" />
-                            <a
+                            <Link
                                 href={booking.meeting_link}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="text-blue-500 hover:underline truncate"
                             >
                                 {booking.meeting_link}
-                            </a>
+                            </Link>
                         </div>
                     )}
 

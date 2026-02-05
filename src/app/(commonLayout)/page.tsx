@@ -1,4 +1,5 @@
 import { Hero } from "@/components/modules/homePage/hero";
+import Link from "next/link";
 
 export default function HomePage() {
     return (
@@ -68,12 +69,12 @@ export default function HomePage() {
                     <p className="mb-6">
                         Join SkillBridge and start your learning journey today.
                     </p>
-                    <a
+                    <Link
                         href="/register"
                         className="inline-block bg-card text-card-foreground font-semibold px-6 py-3 rounded hover:bg-muted transition"
                     >
                         Sign Up Now
-                    </a>
+                    </Link>
                 </div>
             </section>
 

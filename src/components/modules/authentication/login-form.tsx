@@ -1,4 +1,5 @@
 "use client";
+import { getMyTutorProfile } from "@/actions/tutor-profile.action";
 import { Button } from "@/components/ui/button";
 import {
     Card,
@@ -15,6 +16,7 @@ import {
     FieldLabel,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { Roles } from "@/constants/roles";
 import { authClient } from "@/lib/auth-client";
 import { cn } from "@/lib/utils";
 import { useForm } from "@tanstack/react-form";
@@ -45,14 +47,35 @@ export function LoginForm({
             try {
                 const { data, error } = await authClient.signIn.email({
                     ...value,
-                    callbackURL: "http://localhost:3000",
+                    // callbackURL: "http://localhost:3000",
                 });
                 if (error) {
                     toast.error(error.message, { id: toastId });
                     return;
                 }
-                toast.success("Logged in successfully", { id: toastId });
-                router.push("/");
+                const userRole = (data?.user as { role?: string } | undefined)
+                    ?.role;
+                if (userRole === Roles.tutor) {
+                    const { data: tutorData } = await getMyTutorProfile();
+                    console.log("tutor data", tutorData);
+                    if (
+                        tutorData?.success &&
+                        tutorData?.data?.tutorProfiles === null
+                    ) {
+                        toast.success("Logged in successfully", {
+                            id: toastId,
+                        });
+                        router.push("/tutor-dashboard/tutor-profile");
+                    } else {
+                        toast.success("Logged in successfully", {
+                            id: toastId,
+                        });
+                        router.push("/tutor-dashboard");
+                    }
+                } else {
+                    toast.success("Logged in successfully", { id: toastId });
+                    router.push("/");
+                }
             } catch (error: any) {
                 toast.error(error.message, { id: toastId });
             }

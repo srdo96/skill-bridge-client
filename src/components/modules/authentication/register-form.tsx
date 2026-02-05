@@ -15,8 +15,10 @@ import {
     FieldLabel,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { Roles } from "@/constants/roles";
 import { authClient } from "@/lib/auth-client";
 import { useForm } from "@tanstack/react-form";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import * as z from "zod";
@@ -25,6 +27,9 @@ const formSchema = z.object({
     name: z.string().min(1, "Full name is required"),
     email: z.email(),
     password: z.string().min(8, "Password must be at least 8 characters long"),
+    role: z.enum([Roles.student, Roles.tutor] as const, {
+        message: "Please select a role",
+    }),
 });
 
 export function RegisterForm({ ...props }: React.ComponentProps<typeof Card>) {
@@ -34,6 +39,7 @@ export function RegisterForm({ ...props }: React.ComponentProps<typeof Card>) {
             name: "",
             email: "",
             password: "",
+            role: Roles.student,
         },
         validators: {
             onSubmit: formSchema,
@@ -170,6 +176,70 @@ export function RegisterForm({ ...props }: React.ComponentProps<typeof Card>) {
                                 );
                             }}
                         />
+                        <form.Field
+                            name="role"
+                            children={(field) => {
+                                const isInvalid =
+                                    field.state.meta.isTouched &&
+                                    !field.state.meta.isValid;
+                                return (
+                                    <Field>
+                                        <FieldLabel>Select Role</FieldLabel>
+                                        <div className="grid gap-2 sm:grid-cols-2">
+                                            <Button
+                                                type="button"
+                                                variant={
+                                                    field.state.value ===
+                                                    Roles.student
+                                                        ? "default"
+                                                        : "outline"
+                                                }
+                                                onClick={() =>
+                                                    field.handleChange(
+                                                        Roles.student,
+                                                    )
+                                                }
+                                                aria-pressed={
+                                                    field.state.value ===
+                                                    Roles.student
+                                                }
+                                            >
+                                                Student
+                                            </Button>
+                                            <Button
+                                                type="button"
+                                                variant={
+                                                    field.state.value ===
+                                                    Roles.tutor
+                                                        ? "default"
+                                                        : "outline"
+                                                }
+                                                onClick={() =>
+                                                    field.handleChange(
+                                                        Roles.tutor,
+                                                    )
+                                                }
+                                                aria-pressed={
+                                                    field.state.value ===
+                                                    Roles.tutor
+                                                }
+                                            >
+                                                Tutor
+                                            </Button>
+                                        </div>
+                                        <FieldDescription>
+                                            Choose how you want to use the
+                                            platform.
+                                        </FieldDescription>
+                                        {isInvalid && (
+                                            <FieldError
+                                                errors={field.state.meta.errors}
+                                            />
+                                        )}
+                                    </Field>
+                                );
+                            }}
+                        />
                         <FieldGroup>
                             <Field>
                                 <Button type="submit">Create Account</Button>
@@ -178,7 +248,12 @@ export function RegisterForm({ ...props }: React.ComponentProps<typeof Card>) {
                                 </Button>
                                 <FieldDescription className="px-6 text-center">
                                     Already have an account?{" "}
-                                    <a href="#">Sign in</a>
+                                    <Link
+                                        href="/login"
+                                        className="text-primary underline"
+                                    >
+                                        Sign in
+                                    </Link>
                                 </FieldDescription>
                             </Field>
                         </FieldGroup>

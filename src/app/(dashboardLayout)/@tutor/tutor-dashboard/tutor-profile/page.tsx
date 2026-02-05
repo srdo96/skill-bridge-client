@@ -1,6 +1,6 @@
 import { tutorProfileService } from "@/services/tutor-profile.service";
-import { userService } from "@/services/user.service";
-import { TutorProfile, User } from "@/types";
+import { TutorProfile } from "@/types";
+import { AlertTriangle } from "lucide-react";
 import { TutorProfileForm } from "./tutor-profile-form";
 
 async function getProfile(): Promise<TutorProfile | null> {
@@ -15,8 +15,6 @@ async function getProfile(): Promise<TutorProfile | null> {
 
 export default async function TutorProfilePage() {
     const profile = await getProfile();
-    const { data } = await userService.getSession();
-    const user = data?.user as User | undefined;
 
     return (
         <div className="space-y-6">
@@ -27,6 +25,14 @@ export default async function TutorProfilePage() {
                     information up to date.
                 </p>
             </div>
+            {!profile && (
+                <div className="flex items-start gap-2 rounded-lg border border-yellow-200 bg-yellow-50 p-4 text-sm text-yellow-900">
+                    <AlertTriangle className="mt-0.5 h-4 w-4" />
+                    <span>
+                        Create your tutor profile to start receiving bookings.
+                    </span>
+                </div>
+            )}
 
             <TutorProfileForm initialProfile={profile} />
         </div>
