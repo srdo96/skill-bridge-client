@@ -4,7 +4,11 @@ import { TutorAvailabilityForm } from "./tutor-availability-form";
 
 async function getAvailabilities(): Promise<Availability[]> {
     const { data, error } = await tutorProfileService.getMyTutorProfile();
-    return data;
+    if (error || !data) {
+        return [];
+    }
+
+    return data.data.tutorProfiles?.availabilities ?? [];
 }
 
 export default async function TutorAvailabilityPage() {

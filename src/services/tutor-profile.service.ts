@@ -23,7 +23,7 @@ export const tutorProfileService = {
             }
 
             return {
-                data: data?.data?.tutorProfiles?.availabilities ?? [],
+                data: data,
                 error: null,
             };
         } catch (error) {
