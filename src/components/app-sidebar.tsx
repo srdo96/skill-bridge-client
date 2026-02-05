@@ -43,6 +43,18 @@ export function AppSidebar({
     return (
         <Sidebar {...props}>
             <SidebarContent>
+                <SidebarGroup>
+                    <SidebarGroupLabel>Home</SidebarGroupLabel>
+                    <SidebarGroupContent>
+                        <SidebarMenu>
+                            <SidebarMenuItem>
+                                <SidebarMenuButton asChild>
+                                    <Link href="/">Home</Link>
+                                </SidebarMenuButton>
+                            </SidebarMenuItem>
+                        </SidebarMenu>
+                    </SidebarGroupContent>
+                </SidebarGroup>
                 {/* We create a SidebarGroup for each parent. */}
                 {routes.map((item) => (
                     <SidebarGroup key={item.title}>

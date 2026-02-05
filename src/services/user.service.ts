@@ -99,4 +99,33 @@ export const userService = {
             return { data: null, error: { message: "Something went wrong" } };
         }
     },
+    updateMyProfile: async function (payload: {
+        name: string;
+        phone?: string;
+        image?: string;
+    }) {
+        try {
+            const cookieStore = await cookies();
+            const res = await fetch(`${BACKEND_URL}/api/v1/users/me`, {
+                method: "PATCH",
+                headers: {
+                    Cookie: cookieStore.toString(),
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(payload),
+            });
+            const data = await res.json();
+            if (!res.ok) {
+                return {
+                    data: null,
+                    error: {
+                        message: data?.message || "Failed to update profile",
+                    },
+                };
+            }
+            return { data, error: null };
+        } catch (error) {
+            return { data: null, error: { message: "Something went wrong" } };
+        }
+    },
 };
