@@ -4,7 +4,6 @@ import { DataTable } from "./data-table";
 
 async function getData(): Promise<any[]> {
     const { data, error } = await userService.getAllUser();
-    console.log("API Response:", JSON.stringify(data, null, 2));
 
     if (error) {
         return [];

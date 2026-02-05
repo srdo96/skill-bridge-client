@@ -29,6 +29,17 @@ export interface Subject {
     subject_id: string;
     name: string;
     description?: string;
+    category_id?: string;
+}
+
+export interface Category {
+    category_id: string;
+    name: string;
+    desc: string | null;
+    img_url: string | null;
+    created_at: string;
+    updated_at: string;
+    subjects?: Subject[];
 }
 
 export interface Availability {
