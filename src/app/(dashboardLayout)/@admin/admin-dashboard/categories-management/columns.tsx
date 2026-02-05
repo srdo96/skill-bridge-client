@@ -1,7 +1,7 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
-import { Calendar, ChevronDown, ChevronRight, Clock } from "lucide-react";
+import { ChevronDown, ChevronRight } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -11,7 +11,7 @@ import { DataTableMeta } from "./data-table";
 export const columns: ColumnDef<Category>[] = [
     {
         accessorKey: "name",
-        header: "Name",
+        header: "Category Name",
         cell: ({ row }) => (
             <div className="flex items-center gap-3">
                 <div className="flex flex-col">
@@ -67,30 +67,5 @@ export const columns: ColumnDef<Category>[] = [
                 </Button>
             );
         },
-    },
-
-    {
-        accessorKey: "created_at",
-        header: "Created",
-        cell: ({ row }) => (
-            <div className="flex items-center gap-2 text-sm">
-                <Calendar className="h-4 w-4 text-muted-foreground" />
-                <span>
-                    {new Date(row.original.created_at).toLocaleDateString()}
-                </span>
-            </div>
-        ),
-    },
-    {
-        accessorKey: "updated_at",
-        header: "Updated",
-        cell: ({ row }) => (
-            <div className="flex items-center gap-2 text-sm">
-                <Clock className="h-4 w-4 text-muted-foreground" />
-                <span>
-                    {new Date(row.original.updated_at).toLocaleDateString()}
-                </span>
-            </div>
-        ),
     },
 ];
