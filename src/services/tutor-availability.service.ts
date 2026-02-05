@@ -44,17 +44,18 @@ export const tutorAvailabilityService = {
                     headers: { Cookie: cookieStore.toString() },
                 },
             );
-            const data = await res.json();
+            if (res.status === 204) {
+                return { data: null, error: null };
+            }
             if (!res.ok) {
+                const errorMsg =
+                    res.statusText || "Failed to delete availability";
                 return {
                     data: null,
-                    error: {
-                        message:
-                            data?.message || "Failed to delete availability",
-                    },
+                    error: { message: errorMsg },
                 };
             }
-            return { data, error: null };
+            return { data: null, error: null };
         } catch (error) {
             return { data: null, error: { message: "Something went wrong" } };
         }
