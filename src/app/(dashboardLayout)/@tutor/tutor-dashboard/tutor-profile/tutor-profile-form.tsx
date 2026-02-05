@@ -175,15 +175,7 @@ export function TutorProfileForm({
                                 );
                             }}
                         />
-                        {initialProfile && (
-                            <Field>
-                                <FieldLabel>Average Rating</FieldLabel>
-                                <Input
-                                    value={initialProfile.avg_rating.toFixed(1)}
-                                    disabled
-                                />
-                            </Field>
-                        )}
+
                         <Field>
                             <Button type="submit" disabled={isPending}>
                                 {isPending

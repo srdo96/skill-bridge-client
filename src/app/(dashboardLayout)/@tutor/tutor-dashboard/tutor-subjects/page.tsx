@@ -16,8 +16,9 @@ async function getTutorSubjects(): Promise<TutorSubject[]> {
     if (error || !data) {
         return [];
     }
+
     const profile = data.data ?? data;
-    return profile?.tutorSubjects ?? [];
+    return profile?.tutorProfiles?.tutorSubjects ?? [];
 }
 
 export default async function TutorSubjectsPage() {

@@ -7,7 +7,7 @@ export const tutorProfileService = {
     getMyTutorProfile: async function () {
         try {
             const cookieStore = await cookies();
-            const res = await fetch(`${BACKEND_URL}/api/v1/tutor-profiles/me`, {
+            const res = await fetch(`${BACKEND_URL}/api/v1/tutors/my-profile`, {
                 headers: { Cookie: cookieStore.toString() },
                 cache: "no-cache",
             });
@@ -20,6 +20,7 @@ export const tutorProfileService = {
                     },
                 };
             }
+
             return { data, error: null };
         } catch (error) {
             return { data: null, error: { message: "Something went wrong" } };

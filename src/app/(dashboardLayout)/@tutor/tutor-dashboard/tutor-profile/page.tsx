@@ -5,11 +5,12 @@ import { TutorProfileForm } from "./tutor-profile-form";
 
 async function getProfile(): Promise<TutorProfile | null> {
     const { data, error } = await tutorProfileService.getMyTutorProfile();
+    console.log({ data, error });
     if (error || !data) {
         return null;
     }
     if (data.data) {
-        return data.data;
+        return data.data.tutorProfiles;
     }
     return data;
 }
