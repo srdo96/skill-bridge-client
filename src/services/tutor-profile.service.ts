@@ -12,6 +12,7 @@ export const tutorProfileService = {
                 cache: "no-cache",
             });
             const data = await res.json();
+
             if (!res.ok) {
                 return {
                     data: null,
@@ -21,7 +22,10 @@ export const tutorProfileService = {
                 };
             }
 
-            return { data, error: null };
+            return {
+                data: data?.data?.tutorProfiles?.availabilities ?? [],
+                error: null,
+            };
         } catch (error) {
             return { data: null, error: { message: "Something went wrong" } };
         }

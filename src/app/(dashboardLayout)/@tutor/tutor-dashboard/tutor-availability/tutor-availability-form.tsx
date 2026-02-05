@@ -254,12 +254,12 @@ export function TutorAvailabilityForm({
                 <CardContent className="space-y-4">
                     {[...grouped.entries()].map(([day, items]) => (
                         <div key={day} className="space-y-2">
-                            <div className="text-sm font-semibold">{day}</div>
-                            {items.length === 0 ? (
-                                <p className="text-xs text-muted-foreground">
-                                    No slots added
-                                </p>
-                            ) : (
+                            {items.length !== 0 && (
+                                <div className="text-sm font-semibold">
+                                    {day}
+                                </div>
+                            )}
+                            {
                                 <div className="space-y-2">
                                     {items.map((slot) => (
                                         <div
@@ -305,7 +305,7 @@ export function TutorAvailabilityForm({
                                         </div>
                                     ))}
                                 </div>
-                            )}
+                            }
                         </div>
                     ))}
                 </CardContent>
