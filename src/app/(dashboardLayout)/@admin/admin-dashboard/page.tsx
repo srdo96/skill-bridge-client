@@ -10,65 +10,68 @@ import {
 } from "lucide-react";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { dashboardService } from "@/services/dashboard.service";
 
 const stats = [
     {
         label: "Total Users",
-        value: "--",
+        key: "totalUsers",
         icon: Users,
         description: "All registered users",
     },
     {
         label: "Active Users",
-        value: "--",
+        key: "activeUsers",
         icon: Shield,
         description: "Currently active accounts",
     },
     {
         label: "Banned Users",
-        value: "--",
+        key: "bannedUsers",
         icon: UserX,
         description: "Accounts with BAN status",
     },
     {
         label: "Tutors",
-        value: "--",
+        key: "totalTutors",
         icon: GraduationCap,
         description: "Users with tutor profiles",
     },
     {
         label: "Students",
-        value: "--",
+        key: "totalStudents",
         icon: Users,
         description: "Users with student role",
     },
     {
         label: "Categories",
-        value: "--",
+        key: "totalCategories",
         icon: LayoutGrid,
         description: "Subject categories",
     },
     {
         label: "Subjects",
-        value: "--",
+        key: "totalSubjects",
         icon: BookOpen,
         description: "All available subjects",
     },
     {
         label: "Bookings",
-        value: "--",
+        key: "totalBookings",
         icon: CalendarCheck,
         description: "Total tutoring bookings",
     },
     {
         label: "Reviews",
-        value: "--",
+        key: "totalReviews",
         icon: Star,
         description: "Submitted tutor reviews",
     },
 ];
 
-export default function AdminDashboard() {
+export default async function AdminDashboard() {
+    const { data, error } = await dashboardService.getDashboardData();
+    const valueFor = (key: string) => (data ? data[key].toString() : "--");
     return (
         <div className="space-y-6">
             <div>
@@ -89,10 +92,12 @@ export default function AdminDashboard() {
                         </CardHeader>
                         <CardContent>
                             <div className="text-2xl font-semibold">
-                                {stat.value}
+                                {valueFor(stat.key)}
                             </div>
                             <p className="text-xs text-muted-foreground">
-                                {stat.description}
+                                {error
+                                    ? "Failed to load stats"
+                                    : stat.description}
                             </p>
                         </CardContent>
                     </Card>
