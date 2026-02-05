@@ -191,9 +191,10 @@ export function TutorSubjectsForm({
                                                     await removeTutorSubject(
                                                         item.subject_id,
                                                     );
+
                                                 if (result?.error) {
                                                     toast.error(
-                                                        result.error.message,
+                                                        result.error?.message,
                                                     );
                                                     return;
                                                 }
