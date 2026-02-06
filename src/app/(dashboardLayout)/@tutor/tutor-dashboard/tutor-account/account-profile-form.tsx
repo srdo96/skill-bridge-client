@@ -84,6 +84,10 @@ export function AccountProfileForm({ user }: { user: User }) {
                     }}
                 >
                     <FieldGroup>
+                        <Field>
+                            <FieldLabel>ID</FieldLabel>
+                            <Input value={user.id} disabled />
+                        </Field>
                         <form.Field
                             name="name"
                             children={(field) => {

@@ -17,4 +17,25 @@ export const bookingService = {
             return { data: null, error: { message: "Something went wrong" } };
         }
     },
+    getMyBookings: async function () {
+        try {
+            const cookieStore = await cookies();
+            const res = await fetch(`${BACKEND_URL}/api/v1/bookings/`, {
+                headers: { Cookie: cookieStore.toString() },
+                cache: "no-cache",
+            });
+            const data = await res.json();
+            if (!res.ok) {
+                return {
+                    data: null,
+                    error: {
+                        message: data?.message || "Failed to load bookings",
+                    },
+                };
+            }
+            return { data, error: null };
+        } catch (error) {
+            return { data: null, error: { message: "Something went wrong" } };
+        }
+    },
 };
