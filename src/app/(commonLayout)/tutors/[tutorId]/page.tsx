@@ -17,6 +17,7 @@ export default async function TutorDetailsPage({
     params,
 }: TutorDetailsPageProps) {
     const { tutorId } = await params;
+    const { data: session } = await userService.getSession();
     const { data, error } = await userService.getUserTutorById(tutorId);
     console.log("this is data", data);
     if (error || !data?.data) {
@@ -39,6 +40,9 @@ export default async function TutorDetailsPage({
     const subjects: TutorSubject[] = profile?.tutorSubjects ?? [];
     const reviews: Review[] = profile?.reviews ?? [];
     const availabilities: Availability[] = profile?.availabilities ?? [];
+    const bookingHref = session?.user
+        ? `/tutors/${tutor.id}/booking`
+        : "/login";
 
     return (
         <div className="space-y-8">
@@ -112,7 +116,9 @@ export default async function TutorDetailsPage({
                                 </p>
                             </div>
                         </div>
-                        <Button className="w-full">Request booking</Button>
+                        <Button className="w-full" asChild>
+                            <Link href={bookingHref}>Request booking</Link>
+                        </Button>
                         <Button className="w-full" variant="outline" asChild>
                             <Link href="/tutors">Back to tutors</Link>
                         </Button>

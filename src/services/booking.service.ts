@@ -4,6 +4,39 @@ import { cookies } from "next/headers";
 const BACKEND_URL = env.BACKEND_URL;
 
 export const bookingService = {
+    createBooking: async function (payload: {
+        tutor_profile_id: string;
+        subject_id: string;
+        day_of_week: string;
+        start_time: string;
+        end_time: string;
+    }) {
+        try {
+            const cookieStore = await cookies();
+            const res = await fetch(`${BACKEND_URL}/api/v1/bookings`, {
+                method: "POST",
+                headers: {
+                    Cookie: cookieStore.toString(),
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(payload),
+                cache: "no-cache",
+            });
+            const data = await res.json();
+            console.log("data", data);
+            if (!res.ok) {
+                return {
+                    data: null,
+                    error: {
+                        message: data?.message || "Failed to create booking",
+                    },
+                };
+            }
+            return { data, error: null };
+        } catch (error) {
+            return { data: null, error: { message: "Something went wrong" } };
+        }
+    },
     getAllBookings: async function () {
         try {
             const cookieStore = await cookies();
