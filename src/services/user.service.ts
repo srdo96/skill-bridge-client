@@ -27,10 +27,13 @@ export const userService = {
     getAllUser: async function () {
         try {
             const cookieStore = await cookies();
-            const res = await fetch(`${BACKEND_URL}/api/v1/users`, {
-                headers: { Cookie: cookieStore.toString() },
-                cache: "no-cache",
-            });
+            const res = await fetch(
+                `${BACKEND_URL}/api/v1/users?role=TUTOR&status=ACTIVE&tutorProfiles=true`,
+                {
+                    headers: { Cookie: cookieStore.toString() },
+                    cache: "no-cache",
+                },
+            );
 
             const data = await res.json();
             return { data, error: null };
@@ -46,6 +49,27 @@ export const userService = {
                 headers: { Cookie: cookieStore.toString() },
                 cache: "no-cache",
             });
+
+            if (!res.ok) {
+                return { data: null, error: { message: "User not found" } };
+            }
+
+            const data = await res.json();
+            return { data, error: null };
+        } catch (error) {
+            return { data: null, error: { message: "Something went wrong" } };
+        }
+    },
+    getUserTutorById: async function (id: string) {
+        try {
+            const cookieStore = await cookies();
+            const res = await fetch(
+                `${BACKEND_URL}/api/v1/users/public/${id}`,
+                {
+                    headers: { Cookie: cookieStore.toString() },
+                    cache: "no-cache",
+                },
+            );
 
             if (!res.ok) {
                 return { data: null, error: { message: "User not found" } };

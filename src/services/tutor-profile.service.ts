@@ -36,7 +36,7 @@ export const tutorProfileService = {
     }) {
         try {
             const cookieStore = await cookies();
-            const res = await fetch(`${BACKEND_URL}/api/v1/tutor-profiles`, {
+            const res = await fetch(`${BACKEND_URL}/api/v1/tutors/profile`, {
                 method: "POST",
                 headers: {
                     Cookie: cookieStore.toString(),
