@@ -35,6 +35,9 @@ export function DataTable<TData, TValue>({
     data: initialData,
 }: DataTableProps<TData, TValue>) {
     const [data, setData] = useState(initialData);
+    // useEffect(() => {
+    //     setData(initialData);
+    // }, [initialData]);
 
     const table = useReactTable({
         data,
@@ -98,7 +101,7 @@ export function DataTable<TData, TValue>({
                     ))}
                 </TableHeader>
                 <TableBody>
-                    {table.getRowModel().rows?.length ? (
+                    {table?.getRowModel().rows?.length ? (
                         table.getRowModel().rows.map((row) => (
                             <TableRow
                                 key={row.id}

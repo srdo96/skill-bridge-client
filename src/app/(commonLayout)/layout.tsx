@@ -7,7 +7,7 @@ export default function CommonLayout({
     children: React.ReactNode;
 }) {
     return (
-        <div>
+        <div className="container mx-auto">
             <Navbar />
             {children}
             <Footer />

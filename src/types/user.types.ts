@@ -98,6 +98,7 @@ export interface TutorProfile {
     tutorSubjects?: TutorSubject[];
     reviews?: Review[];
     bookings?: Booking[];
+    is_featured: boolean;
 }
 
 export interface User {

@@ -7,7 +7,7 @@ import {
     getPaginationRowModel,
     useReactTable,
 } from "@tanstack/react-table";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import {
     Table,
@@ -35,6 +35,9 @@ export function DataTable<TData, TValue>({
     data: initialData,
 }: DataTableProps<TData, TValue>) {
     const [data, setData] = useState(initialData);
+    useEffect(() => {
+        setData(initialData);
+    }, [initialData]);
 
     const table = useReactTable({
         data,

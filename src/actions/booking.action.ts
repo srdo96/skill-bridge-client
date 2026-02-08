@@ -18,3 +18,12 @@ export const createBooking = async (payload: {
     revalidatePath("/dashboard/bookings");
     return { data, error: null };
 };
+
+export const cancelBooking = async (bookingId: string) => {
+    const { data, error } = await bookingService.cancelBooking(bookingId);
+    if (error) {
+        return { data: null, error };
+    }
+    revalidatePath("/dashboard/bookings");
+    return { data, error: null };
+};

@@ -59,13 +59,15 @@ export const tutorProfileService = {
         }
     },
     updateTutorProfile: async function (
-        payload: {
+        payload: Partial<{
             hourly_rate: number;
             year_of_experience: number;
-        },
+            is_featured: boolean;
+        }>,
         tutor_profile_id: string,
     ) {
         try {
+            console.log("payload", payload);
             const cookieStore = await cookies();
             const res = await fetch(
                 `${BACKEND_URL}/api/v1/tutors/profile/${tutor_profile_id}`,

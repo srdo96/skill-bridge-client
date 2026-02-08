@@ -32,16 +32,16 @@ interface Hero3Props {
 }
 
 const Hero = ({
-    heading = "Blocks built with Shadcn & Tailwind",
-    description = "Finely crafted components built with React, Tailwind and Shadcn UI. Developers can copy and paste these blocks directly into their project.",
+    heading = "Find Your Perfect Tutor on SkillBridge",
+    description = "Connect with expert tutors, book personalized sessions, and master any subject at your own pace.",
     buttons = {
         primary: {
-            text: "Sign Up",
-            url: "https://www.shadcnblocks.com",
+            text: "Browse Tutors",
+            url: "/tutors",
         },
         secondary: {
             text: "Get Started",
-            url: "https://www.shadcnblocks.com",
+            url: "/register",
         },
     },
 
@@ -78,7 +78,7 @@ const Hero = ({
                 </div>
                 <div className="flex">
                     <Image
-                        src="/images/hero-image.png"
+                        src="/hero-image.png"
                         width={500}
                         height={500}
                         alt="placeholder hero"

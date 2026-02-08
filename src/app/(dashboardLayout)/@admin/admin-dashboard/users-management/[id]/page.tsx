@@ -678,12 +678,14 @@ function BookingsList({ bookings }: { bookings: Booking[] }) {
                     <Separator />
 
                     <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4 text-sm">
-                        <div className="flex items-center gap-2">
-                            <BookOpen className="h-4 w-4 text-muted-foreground" />
-                            <span>
-                                {booking.subject?.name || "Subject N/A"}
-                            </span>
-                        </div>
+                        {booking.subject && (
+                            <div className="flex items-center gap-2">
+                                <BookOpen className="h-4 w-4 text-muted-foreground" />
+                                <span>
+                                    {booking.subject?.name || "Subject N/A"}
+                                </span>
+                            </div>
+                        )}
                         <div className="flex items-center gap-2">
                             <Badge
                                 className={getDayColor(booking.day_of_week)}

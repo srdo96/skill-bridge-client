@@ -24,11 +24,11 @@ export const userService = {
             return { data: null, error: { message: "Something went wrong!" } };
         }
     },
-    getAllUser: async function () {
+    getAllUser: async function (paramsString = "") {
         try {
             const cookieStore = await cookies();
             const res = await fetch(
-                `${BACKEND_URL}/api/v1/users?role=TUTOR&status=ACTIVE&tutorProfiles=true`,
+                `${BACKEND_URL}/api/v1/users?${paramsString}`,
                 {
                     headers: { Cookie: cookieStore.toString() },
                     cache: "no-cache",
@@ -36,6 +36,7 @@ export const userService = {
             );
 
             const data = await res.json();
+            console.log("data", data);
             return { data, error: null };
         } catch (error) {
             return { data: null, error: { message: "Something went wrong" } };

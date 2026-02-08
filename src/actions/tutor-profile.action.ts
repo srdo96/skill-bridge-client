@@ -45,3 +45,18 @@ export const updateTutorProfile = async (
     revalidatePath("/tutor-dashboard/tutor-profile");
     return { data, error: null };
 };
+
+export const setTutorFeatured = async (
+    tutor_profile_id: string,
+    is_featured: boolean,
+) => {
+    const { data, error } = await tutorProfileService.updateTutorProfile(
+        { is_featured },
+        tutor_profile_id,
+    );
+    if (error) {
+        return { data: null, error };
+    }
+    revalidatePath("/admin-dashboard/users-management");
+    return { data, error: null };
+};

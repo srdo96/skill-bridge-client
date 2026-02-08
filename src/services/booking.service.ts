@@ -40,7 +40,7 @@ export const bookingService = {
     getAllBookings: async function () {
         try {
             const cookieStore = await cookies();
-            const res = await fetch(`${BACKEND_URL}/api/v1/admin/bookings`, {
+            const res = await fetch(`${BACKEND_URL}/api/v1/bookings`, {
                 headers: { Cookie: cookieStore.toString() },
                 cache: "no-cache",
             });
@@ -55,7 +55,7 @@ export const bookingService = {
             const cookieStore = await cookies();
             const res = await fetch(`${BACKEND_URL}/api/v1/bookings/`, {
                 headers: { Cookie: cookieStore.toString() },
-                cache: "no-cache",
+                cache: "no-store",
             });
             const data = await res.json();
             if (!res.ok) {
@@ -63,6 +63,32 @@ export const bookingService = {
                     data: null,
                     error: {
                         message: data?.message || "Failed to load bookings",
+                    },
+                };
+            }
+            return { data, error: null };
+        } catch (error) {
+            return { data: null, error: { message: "Something went wrong" } };
+        }
+    },
+    cancelBooking: async function (bookingId: string) {
+        console.log("bookingId", bookingId);
+        try {
+            const cookieStore = await cookies();
+            const res = await fetch(
+                `${BACKEND_URL}/api/v1/bookings/${bookingId}/cancel`,
+                {
+                    method: "PATCH",
+                    headers: { Cookie: cookieStore.toString() },
+                    cache: "no-cache",
+                },
+            );
+            const data = await res.json();
+            if (!res.ok) {
+                return {
+                    data: null,
+                    error: {
+                        message: data?.message || "Failed to cancel booking",
                     },
                 };
             }

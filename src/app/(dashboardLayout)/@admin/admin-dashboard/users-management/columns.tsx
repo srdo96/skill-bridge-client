@@ -1,11 +1,12 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
-import { BanIcon, EyeIcon, Loader2 } from "lucide-react";
+import { BanIcon, EyeIcon, Loader2, Star as StarIcon } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";
 
+import { setTutorFeatured } from "@/actions/tutor-profile.action";
 import { banUser, unbanUser } from "@/actions/user.action";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -23,6 +24,10 @@ function ActionCell({
     updateRow: (rowIndex: number, newData: Partial<User>) => void;
 }) {
     const [isLoading, setIsLoading] = useState(false);
+    const [isFeatureLoading, setIsFeatureLoading] = useState(false);
+    const isTutor = user.role === UserRoles.TUTOR;
+    const tutorProfile = user.tutorProfiles ?? null;
+    const isFeatured = tutorProfile?.is_featured ?? false;
 
     const handleBanUser = async () => {
         const currentStatus = user.status;
@@ -65,6 +70,44 @@ function ActionCell({
         }
     };
 
+    const handleToggleFeatured = async () => {
+        if (!tutorProfile?.tutor_profile_id) {
+            toast.error("Tutor profile not found");
+            return;
+        }
+
+        const nextFeatured = !isFeatured;
+        setIsFeatureLoading(true);
+
+        const updatedTutorProfile = {
+            ...tutorProfile,
+            is_featured: nextFeatured,
+        };
+        updateRow(rowIndex, { tutorProfiles: updatedTutorProfile });
+
+        try {
+            const result = await setTutorFeatured(
+                tutorProfile.tutor_profile_id,
+                nextFeatured,
+            );
+            if (result?.error) {
+                updateRow(rowIndex, { tutorProfiles: tutorProfile });
+                toast.error(result.error.message);
+            } else {
+                toast.success(
+                    nextFeatured
+                        ? "Tutor featured successfully"
+                        : "Tutor unfeatured successfully",
+                );
+            }
+        } catch {
+            updateRow(rowIndex, { tutorProfiles: tutorProfile });
+            toast.error("Something went wrong");
+        } finally {
+            setIsFeatureLoading(false);
+        }
+    };
+
     return (
         <div className="flex gap-2">
             <Button variant="outline" size="sm" asChild>
@@ -86,6 +129,21 @@ function ActionCell({
                 )}
                 {user.status === UserStatus.ACTIVE ? "Ban" : "Unban"}
             </Button>
+            {isTutor && (
+                <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleToggleFeatured}
+                    disabled={isFeatureLoading}
+                >
+                    {isFeatureLoading ? (
+                        <Loader2 className="w-4 h-4 mr-1 animate-spin" />
+                    ) : (
+                        <StarIcon className="w-4 h-4 mr-1" />
+                    )}
+                    {isFeatured ? "Unfeature" : "Feature"}
+                </Button>
+            )}
         </div>
     );
 }
@@ -125,6 +183,21 @@ export const columns: ColumnDef<User>[] = [
                     }
                 >
                     {status}
+                </Badge>
+            );
+        },
+    },
+    {
+        accessorKey: "tutorProfiles.is_featured",
+        header: "Featured",
+        cell: ({ row }) => {
+            const is_Featured = row.original.tutorProfiles?.is_featured;
+            const role = row.original.role;
+            return (
+                <Badge variant={is_Featured === true ? "success" : "default"}>
+                    {role === UserRoles.TUTOR && is_Featured === true
+                        ? "Yes"
+                        : ""}
                 </Badge>
             );
         },

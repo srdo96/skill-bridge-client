@@ -1,6 +1,6 @@
 import { bookingService } from "@/services/booking.service";
 import { Booking } from "@/types";
-import { DataTable } from "../../../@admin/admin-dashboard/booking-management/data-table";
+import { DataTable } from "../../../@admin/admin-dashboard/bookings-management/data-table";
 import { columns } from "./columns";
 
 async function getBookings(): Promise<Booking[]> {

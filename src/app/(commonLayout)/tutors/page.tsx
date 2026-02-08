@@ -10,65 +10,12 @@ import { userService } from "@/services/user.service";
 import { User } from "@/types";
 import Link from "next/link";
 
-const tutorss = [
-    {
-        id: "tutor-01",
-        name: "Amina Rahman",
-        title: "Math & Physics Tutor",
-        rating: 4.9,
-        reviews: 128,
-        hourlyRate: 25,
-        location: "Dhaka",
-        availability: "Mon - Thu",
-        subjects: ["Algebra", "Calculus", "Physics"],
-        bio: "Helping students build strong fundamentals and exam confidence.",
-        image: "https://i.pravatar.cc/100?img=32",
-    },
-    {
-        id: "tutor-02",
-        name: "Rafiul Islam",
-        title: "English & IELTS Coach",
-        rating: 4.8,
-        reviews: 96,
-        hourlyRate: 20,
-        location: "Chattogram",
-        availability: "Tue - Sat",
-        subjects: ["IELTS", "Writing", "Speaking"],
-        bio: "Focused lessons with feedback and practice materials.",
-        image: "https://i.pravatar.cc/100?img=12",
-    },
-    {
-        id: "tutor-03",
-        name: "Sadia Ahmed",
-        title: "Chemistry Tutor",
-        rating: 4.7,
-        reviews: 74,
-        hourlyRate: 22,
-        location: "Sylhet",
-        availability: "Weekend",
-        subjects: ["Organic", "Inorganic", "Lab Prep"],
-        bio: "Concept-driven chemistry lessons with real examples.",
-        image: "https://i.pravatar.cc/100?img=5",
-    },
-    {
-        id: "tutor-04",
-        name: "Mahbub Hasan",
-        title: "Computer Science Mentor",
-        rating: 4.9,
-        reviews: 156,
-        hourlyRate: 30,
-        location: "Rajshahi",
-        availability: "Mon - Fri",
-        subjects: ["DSA", "Web Dev", "Python"],
-        bio: "Practical, project-based learning for all levels.",
-        image: "https://i.pravatar.cc/100?img=15",
-    },
-];
-
 export default async function TutorsPage() {
-    const { data, error } = await userService.getAllUser();
-    const tutors: User[] = data.data.data;
-    console.log("tutors data", tutors[0].tutorProfiles?.tutorSubjects);
+    const { data, error } = await userService.getAllUser(
+        "role=TUTOR&status=ACTIVE&tutorProfiles=true",
+    );
+    console.log("datasss", data);
+    const tutors: User[] = data.data;
     return (
         <div className="space-y-8">
             <div className="space-y-2">
