@@ -11,7 +11,8 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { dashboardService } from "@/services/dashboard.service";
-import { BookingStatus } from "@/types/user.types";
+import { tutorProfileService } from "@/services/tutor-profile.service";
+import { Booking, BookingStatus, Review } from "@/types/user.types";
 
 type TutorDashboardData = {
     bookings: {
@@ -49,14 +50,29 @@ const formatRating = (value: number) =>
         minimumFractionDigits: 1,
     }).format(value);
 
+const formatDate = (value: string) =>
+    new Date(value).toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+    });
+
+const formatTimeRange = (start: string, end: string) =>
+    `${start ?? "--"} - ${end ?? "--"}`;
+
 export default async function TutorDashboard() {
     const { data, error } = await dashboardService.getTutorDashboardData();
-    console.log("data", data);
+    const { data: profileData } = await tutorProfileService.getMyTutorProfile();
+    console.log("dataaaa", profileData);
     const dashboard: TutorDashboardData = data ?? {
         bookings: { total: 0, byStatus: {} },
         totalEarnings: 0,
         reviews: { total: 0, avgRating: 0 },
     };
+    const profile = profileData?.data?.tutorProfiles ?? null;
+    const sessions: Booking[] = profile?.bookings ?? [];
+    console.log("session", sessions);
+    const reviews: Review[] = profile?.reviews ?? [];
     const statusEntries = Object.entries(dashboard.bookings.byStatus || {});
     const orderedStatuses = statusOrder.map((status) => ({
         status,
@@ -263,6 +279,127 @@ export default async function TutorDashboard() {
                         </CardContent>
                     </Card>
                 </div>
+            </div>
+
+            <div className="grid gap-6 lg:grid-cols-[2fr_1fr]">
+                <Card>
+                    <CardHeader>
+                        <CardTitle className="text-base">
+                            Teaching sessions
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                        {sessions.length === 0 ? (
+                            <p className="text-sm text-muted-foreground">
+                                No sessions yet.
+                            </p>
+                        ) : (
+                            <div className="space-y-3">
+                                {sessions.map((session) => (
+                                    <div
+                                        key={session.booking_id}
+                                        className="rounded-lg border p-4"
+                                    >
+                                        <div className="flex flex-wrap items-center justify-between gap-2">
+                                            <div className="space-y-1">
+                                                <p className="text-sm font-semibold">
+                                                    {session.subject?.name ??
+                                                        "Session"}
+                                                </p>
+                                                <p className="text-xs text-muted-foreground">
+                                                    {session.student?.name ??
+                                                        "Student"}{" "}
+                                                    · {session.day_of_week} ·{" "}
+                                                    {formatTimeRange(
+                                                        session.start_time,
+                                                        session.end_time,
+                                                    )}
+                                                </p>
+                                            </div>
+                                            <Badge
+                                                variant={
+                                                    statusVariants[
+                                                        session.status
+                                                    ] ?? "secondary"
+                                                }
+                                            >
+                                                {session.status}
+                                            </Badge>
+                                        </div>
+                                        <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                                            <span>
+                                                Booked{" "}
+                                                {formatDate(session.created_at)}
+                                            </span>
+                                            <span>·</span>
+                                            <span>Price: ${session.price}</span>
+                                            {session.meeting_link && (
+                                                <>
+                                                    <span>·</span>
+                                                    <a
+                                                        href={
+                                                            session.meeting_link
+                                                        }
+                                                        className="text-primary underline"
+                                                        target="_blank"
+                                                        rel="noreferrer"
+                                                    >
+                                                        Meeting link
+                                                    </a>
+                                                </>
+                                            )}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </CardContent>
+                </Card>
+
+                <Card>
+                    <CardHeader>
+                        <CardTitle className="text-base">
+                            Ratings & reviews
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                        {reviews.length === 0 ? (
+                            <p className="text-sm text-muted-foreground">
+                                No reviews yet.
+                            </p>
+                        ) : (
+                            <div className="space-y-3">
+                                {reviews.map((review) => (
+                                    <div
+                                        key={review.review_id}
+                                        className="rounded-lg border p-4"
+                                    >
+                                        <div className="flex items-center justify-between gap-2">
+                                            <div className="flex items-center gap-2">
+                                                <Star className="h-4 w-4 text-yellow-500" />
+                                                <span className="text-sm font-semibold">
+                                                    {review.rating}
+                                                </span>
+                                                <span className="text-xs text-muted-foreground">
+                                                    {review.student?.name ??
+                                                        "Anonymous student"}
+                                                </span>
+                                            </div>
+                                            <span className="text-xs text-muted-foreground">
+                                                {formatDate(review.created_at)}
+                                            </span>
+                                        </div>
+                                        {review.comment && (
+                                            <p className="mt-2 text-sm text-muted-foreground">
+                                                {review.comment}
+                                            </p>
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </CardContent>
+                </Card>
             </div>
         </div>
     );
