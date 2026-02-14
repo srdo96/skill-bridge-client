@@ -10,7 +10,6 @@ type UserManagementProps = {
 
 async function getData(): Promise<any[]> {
     const { data, error } = await userService.getAllUser();
-    console.log("users data", data);
 
     if (error) {
         return [];

@@ -36,7 +36,6 @@ export const userService = {
             );
 
             const data = await res.json();
-            console.log("data", data);
             return { data, error: null };
         } catch (error) {
             return { data: null, error: { message: "Something went wrong" } };
@@ -85,14 +84,13 @@ export const userService = {
 
     banUser: async function (id: string) {
         try {
-            console.log("banUser", id);
             const cookieStore = await cookies();
             const res = await fetch(`${BACKEND_URL}/api/v1/users/${id}/ban`, {
                 method: "PATCH",
                 headers: { Cookie: cookieStore.toString() },
                 cache: "no-cache",
             });
-            console.log("res", res);
+
             if (!res.ok) {
                 return { data: null, error: { message: "Failed to ban user" } };
             }

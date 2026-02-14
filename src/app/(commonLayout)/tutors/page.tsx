@@ -4,18 +4,41 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
+import { categoryService } from "@/services/category.service";
 import { userService } from "@/services/user.service";
-import { User } from "@/types";
+import { Category, User } from "@/types";
 import Link from "next/link";
+import TutorFilters from "./tutor-filters";
 
-export default async function TutorsPage() {
-    const { data, error } = await userService.getAllUser(
+interface TutorsPageProps {
+    searchParams: Promise<{
+        search?: string;
+        category?: string;
+        minRating?: string;
+        maxPrice?: string;
+    }>;
+}
+
+export default async function TutorsPage({ searchParams }: TutorsPageProps) {
+    const { search, category, minRating, maxPrice } = await searchParams;
+
+    const params = new URLSearchParams(
         "role=TUTOR&status=ACTIVE&tutorProfiles=true",
     );
-    console.log("datasss", data);
-    const tutors: User[] = data.data;
+    if (search) params.set("search", search);
+    if (category) params.set("category", category);
+    if (minRating) params.set("minRating", minRating);
+    if (maxPrice) params.set("maxPrice", maxPrice);
+
+    const [{ data }, { data: categoryData }] = await Promise.all([
+        userService.getAllUser(params.toString()),
+        categoryService.getAllCategories(),
+    ]);
+    console.log("Category Data", categoryData);
+
+    const tutors: User[] = data?.data ?? [];
+    const categories: Category[] = categoryData?.data ?? [];
     return (
         <div className="space-y-8">
             <div className="space-y-2">
@@ -25,34 +48,7 @@ export default async function TutorsPage() {
                 </p>
             </div>
 
-            <Card>
-                <CardHeader>
-                    <CardTitle className="text-base">Filters</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-                        <Input placeholder="Search by name or subject" />
-                        <Input placeholder="Subject (e.g. Math)" />
-                        <Input placeholder="Min rating (e.g. 4.5)" />
-                        <Input placeholder="Max price (e.g. 25)" />
-                    </div>
-                    <div className="flex flex-wrap items-center gap-2">
-                        {["Weekdays", "Weekend", "Morning", "Evening"].map(
-                            (label) => (
-                                <Badge key={label} variant="secondary">
-                                    {label}
-                                </Badge>
-                            ),
-                        )}
-                    </div>
-                    <div className="flex items-center gap-2">
-                        <Button type="button">Apply Filters</Button>
-                        <Button type="button" variant="outline">
-                            Reset
-                        </Button>
-                    </div>
-                </CardContent>
-            </Card>
+            <TutorFilters categories={categories} />
 
             <div className="flex items-center justify-between">
                 <p className="text-sm text-muted-foreground">

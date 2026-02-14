@@ -21,6 +21,7 @@ export const reviewService = {
                 body: JSON.stringify(payload),
                 cache: "no-cache",
             });
+
             const data = await res.json();
             if (!res.ok) {
                 return {
