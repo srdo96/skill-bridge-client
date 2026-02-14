@@ -57,7 +57,6 @@ export function LoginForm({
                     ?.role;
                 if (userRole === Roles.tutor) {
                     const { data: tutorData } = await getMyTutorProfile();
-                    console.log("tutor data", tutorData);
                     if (
                         tutorData?.success &&
                         tutorData?.data?.tutorProfiles === null
@@ -81,6 +80,7 @@ export function LoginForm({
             }
         },
     });
+    const isSubmitting = form.state.isSubmitting;
     return (
         <div className={cn("flex flex-col gap-6", className)} {...props}>
             <Card>
@@ -167,7 +167,14 @@ export function LoginForm({
                             />
                             <FieldGroup>
                                 <Field>
-                                    <Button type="submit">Login</Button>
+                                    <Button
+                                        type="submit"
+                                        disabled={isSubmitting}
+                                    >
+                                        {isSubmitting
+                                            ? "Logging in..."
+                                            : "Login"}
+                                    </Button>
                                     {/* <Button variant="outline" type="button">
                                         Login with Google
                                     </Button> */}

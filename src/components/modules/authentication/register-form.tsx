@@ -64,6 +64,7 @@ export function RegisterForm({ ...props }: React.ComponentProps<typeof Card>) {
             }
         },
     });
+    const isSubmitting = form.state.isSubmitting;
     return (
         <Card {...props}>
             <CardHeader>
@@ -242,8 +243,16 @@ export function RegisterForm({ ...props }: React.ComponentProps<typeof Card>) {
                         />
                         <FieldGroup>
                             <Field>
-                                <Button type="submit">Create Account</Button>
-                                <Button variant="outline" type="button">
+                                <Button type="submit" disabled={isSubmitting}>
+                                    {isSubmitting
+                                        ? "Creating account..."
+                                        : "Create Account"}
+                                </Button>
+                                <Button
+                                    variant="outline"
+                                    type="button"
+                                    disabled={isSubmitting}
+                                >
                                     Sign up with Google
                                 </Button>
                                 <FieldDescription className="px-6 text-center">
