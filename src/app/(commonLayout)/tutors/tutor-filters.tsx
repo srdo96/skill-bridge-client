@@ -91,7 +91,7 @@ export default function TutorFilters({ categories }: TutorFiltersProps) {
                             <SelectValue placeholder="Select category" />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="all">All</SelectItem>
+                            <SelectItem value="all">All Categories</SelectItem>
                             {categories.map((cat) => (
                                 <SelectItem key={cat.name} value={cat.name}>
                                     {cat.name}

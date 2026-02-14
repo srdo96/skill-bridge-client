@@ -3,19 +3,51 @@ import { Booking } from "@/types";
 import { DataTable } from "../../../@admin/admin-dashboard/bookings-management/data-table";
 import { columns } from "./columns";
 
-async function getBookings(): Promise<Booking[]> {
-    const { data, error } = await bookingService.getMyBookings();
-    if (error || !data) {
-        return [];
-    }
-    if (Array.isArray(data.data)) {
-        return data.data;
-    }
-    return Array.isArray(data) ? data : [];
+interface StudentBookingsPageProps {
+    searchParams: Promise<{
+        page?: string;
+        limit?: string;
+    }>;
 }
 
-export default async function StudentBookingsPage() {
-    const bookings = await getBookings();
+async function getBookings(
+    page: number,
+    limit: number,
+): Promise<{
+    bookings: Booking[];
+    total: number;
+    totalPages: number;
+    page: number;
+    limit: number;
+}> {
+    const params = new URLSearchParams({
+        page: String(page),
+        limit: String(limit),
+    });
+    const { data, error } = await bookingService.getMyBookings(
+        params.toString(),
+    );
+    if (error || !data) {
+        return { bookings: [], total: 0, totalPages: 1, page, limit };
+    }
+
+    const payload = data?.data ?? data;
+    return {
+        bookings: payload?.bookings ?? [],
+        total: Number(payload?.total ?? 0),
+        totalPages: Number(payload?.totalPages ?? 1),
+        page: Number(payload?.page ?? page),
+        limit: Number(payload?.limit ?? limit),
+    };
+}
+
+export default async function StudentBookingsPage({
+    searchParams,
+}: StudentBookingsPageProps) {
+    const { page: pageParam, limit: limitParam } = await searchParams;
+    const page = Math.max(1, Number(pageParam) || 1);
+    const limit = Math.max(1, Number(limitParam) || 10);
+    const data = await getBookings(page, limit);
 
     return (
         <div className="space-y-6">
@@ -28,7 +60,16 @@ export default async function StudentBookingsPage() {
 
             <div className="space-y-3">
                 <h2 className="text-lg font-semibold">Booking List</h2>
-                <DataTable columns={columns} data={bookings} />
+                <DataTable
+                    columns={columns}
+                    data={data.bookings}
+                    serverPagination={{
+                        page: data.page,
+                        limit: data.limit,
+                        totalPages: data.totalPages,
+                        total: data.total,
+                    }}
+                />
             </div>
         </div>
     );

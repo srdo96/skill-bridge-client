@@ -5,10 +5,13 @@ import {
     flexRender,
     getCoreRowModel,
     getPaginationRowModel,
+    PaginationState,
     useReactTable,
 } from "@tanstack/react-table";
-import { useState } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 
+import { DataTablePagination } from "@/components/layout/data-table-pagination";
 import {
     Table,
     TableBody,
@@ -17,11 +20,16 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/layout/table";
-import { Button } from "@/components/ui/button";
 
 interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[];
     data: TData[];
+    serverPagination?: {
+        page: number;
+        limit: number;
+        total: number;
+        totalPages: number;
+    };
 }
 
 // Context to share updateData function with cells
@@ -33,17 +41,47 @@ export type DataTableMeta<TData> = {
 export function DataTable<TData, TValue>({
     columns,
     data: initialData,
+    serverPagination,
 }: DataTableProps<TData, TValue>) {
+    console.log("ini", initialData);
+    const router = useRouter();
+    const pathname = usePathname();
+    const searchParams = useSearchParams();
+
     const [data, setData] = useState(initialData);
-    // useEffect(() => {
-    //     setData(initialData);
-    // }, [initialData]);
+    const [pagination, setPagination] = useState<PaginationState>({
+        pageIndex: 0,
+        pageSize: serverPagination?.limit ?? 10,
+    });
+    useEffect(() => {
+        setData(initialData);
+    }, [initialData]);
+
+    const handlePageChange = (page: number) => {
+        if (!serverPagination) return;
+        const params = new URLSearchParams(searchParams?.toString() ?? "");
+        params.set("page", String(page));
+        params.set("limit", String(serverPagination.limit));
+        router.push(`${pathname}?${params.toString()}`);
+    };
+
+    const handlePageSizeChange = (pageSize: number) => {
+        if (!serverPagination) return;
+        const params = new URLSearchParams(searchParams?.toString() ?? "");
+        params.set("page", "1");
+        params.set("limit", String(pageSize));
+        router.push(`${pathname}?${params.toString()}`);
+    };
 
     const table = useReactTable({
         data,
         columns,
         getCoreRowModel: getCoreRowModel(),
         getPaginationRowModel: getPaginationRowModel(),
+        onPaginationChange: setPagination,
+        state: {
+            pagination,
+        },
         meta: {
             updateData: (
                 rowIndex: number,
@@ -129,24 +167,16 @@ export function DataTable<TData, TValue>({
                     )}
                 </TableBody>
             </Table>
-            <div className="flex items-center justify-end gap-2 p-4">
-                <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => table.previousPage()}
-                    disabled={!table.getCanPreviousPage()}
-                >
-                    Previous
-                </Button>
-                <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => table.nextPage()}
-                    disabled={!table.getCanNextPage()}
-                >
-                    Next
-                </Button>
-            </div>
+            <DataTablePagination
+                table={table}
+                page={serverPagination?.page}
+                totalPages={serverPagination?.totalPages}
+                pageSize={serverPagination?.limit}
+                onPageChange={serverPagination ? handlePageChange : undefined}
+                onPageSizeChange={
+                    serverPagination ? handlePageSizeChange : undefined
+                }
+            />
         </div>
     );
 }

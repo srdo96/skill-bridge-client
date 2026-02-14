@@ -37,12 +37,14 @@ export const bookingService = {
             return { data: null, error: { message: "Something went wrong" } };
         }
     },
-    getAllBookings: async function () {
+
+    getAllBookings: async function (paramsString = "") {
         try {
             const cookieStore = await cookies();
-            const res = await fetch(`${BACKEND_URL}/api/v1/bookings`, {
+            const query = paramsString ? `${paramsString}` : "";
+            const res = await fetch(`${BACKEND_URL}/api/v1/bookings?${query}`, {
                 headers: { Cookie: cookieStore.toString() },
-                cache: "no-cache",
+                cache: "no-store",
             });
             const data = await res.json();
             return { data, error: null };
@@ -50,10 +52,12 @@ export const bookingService = {
             return { data: null, error: { message: "Something went wrong" } };
         }
     },
-    getMyBookings: async function () {
+
+    getMyBookings: async function (paramsString = "") {
         try {
             const cookieStore = await cookies();
-            const res = await fetch(`${BACKEND_URL}/api/v1/bookings/`, {
+            const query = paramsString ? `${paramsString}` : "";
+            const res = await fetch(`${BACKEND_URL}/api/v1/bookings?${query}`, {
                 headers: { Cookie: cookieStore.toString() },
                 cache: "no-store",
             });
@@ -66,11 +70,13 @@ export const bookingService = {
                     },
                 };
             }
+
             return { data, error: null };
         } catch (error) {
             return { data: null, error: { message: "Something went wrong" } };
         }
     },
+
     cancelBooking: async function (bookingId: string) {
         console.log("bookingId", bookingId);
         try {
