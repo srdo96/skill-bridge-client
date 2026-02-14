@@ -36,6 +36,7 @@ export const userService = {
             );
 
             const data = await res.json();
+            console.log("data Ser:", data);
             return { data, error: null };
         } catch (error) {
             return { data: null, error: { message: "Something went wrong" } };

@@ -103,4 +103,30 @@ export const bookingService = {
             return { data: null, error: { message: "Something went wrong" } };
         }
     },
+
+    completeBooking: async function (bookingId: string) {
+        try {
+            const cookieStore = await cookies();
+            const res = await fetch(
+                `${BACKEND_URL}/api/v1/bookings/${bookingId}/complete`,
+                {
+                    method: "PATCH",
+                    headers: { Cookie: cookieStore.toString() },
+                    cache: "no-cache",
+                },
+            );
+            const data = await res.json();
+            if (!res.ok) {
+                return {
+                    data: null,
+                    error: {
+                        message: data?.message || "Failed to complete booking",
+                    },
+                };
+            }
+            return { data, error: null };
+        } catch (error) {
+            return { data: null, error: { message: "Something went wrong" } };
+        }
+    },
 };

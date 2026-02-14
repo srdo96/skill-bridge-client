@@ -35,9 +35,9 @@ export default async function TutorsPage({ searchParams }: TutorsPageProps) {
         userService.getAllUser(params.toString()),
         categoryService.getAllCategories(),
     ]);
-    console.log("Category Data", categoryData);
 
     const tutors: User[] = data?.data ?? [];
+    console.log("Category Data", tutors);
     const categories: Category[] = categoryData?.data ?? [];
     return (
         <div className="space-y-8">

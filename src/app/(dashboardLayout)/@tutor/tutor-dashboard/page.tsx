@@ -8,11 +8,11 @@ import {
     XCircle,
 } from "lucide-react";
 
-import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { dashboardService } from "@/services/dashboard.service";
 import { tutorProfileService } from "@/services/tutor-profile.service";
 import { Booking, BookingStatus, Review } from "@/types/user.types";
+import { TutorSessionsList } from "./tutor-sessions-list";
 
 type TutorDashboardData = {
     bookings: {
@@ -57,13 +57,9 @@ const formatDate = (value: string) =>
         year: "numeric",
     });
 
-const formatTimeRange = (start: string, end: string) =>
-    `${start ?? "--"} - ${end ?? "--"}`;
-
 export default async function TutorDashboard() {
     const { data, error } = await dashboardService.getTutorDashboardData();
     const { data: profileData } = await tutorProfileService.getMyTutorProfile();
-    console.log("dataaaa", profileData);
     const dashboard: TutorDashboardData = data ?? {
         bookings: { total: 0, byStatus: {} },
         totalEarnings: 0,
@@ -289,70 +285,7 @@ export default async function TutorDashboard() {
                         </CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-4">
-                        {sessions.length === 0 ? (
-                            <p className="text-sm text-muted-foreground">
-                                No sessions yet.
-                            </p>
-                        ) : (
-                            <div className="space-y-3">
-                                {sessions.map((session) => (
-                                    <div
-                                        key={session.booking_id}
-                                        className="rounded-lg border p-4"
-                                    >
-                                        <div className="flex flex-wrap items-center justify-between gap-2">
-                                            <div className="space-y-1">
-                                                <p className="text-sm font-semibold">
-                                                    {session.subject?.name ??
-                                                        "Session"}
-                                                </p>
-                                                <p className="text-xs text-muted-foreground">
-                                                    {session.student?.name ??
-                                                        "Student"}{" "}
-                                                    · {session.day_of_week} ·{" "}
-                                                    {formatTimeRange(
-                                                        session.start_time,
-                                                        session.end_time,
-                                                    )}
-                                                </p>
-                                            </div>
-                                            <Badge
-                                                variant={
-                                                    statusVariants[
-                                                        session.status
-                                                    ] ?? "secondary"
-                                                }
-                                            >
-                                                {session.status}
-                                            </Badge>
-                                        </div>
-                                        <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-                                            <span>
-                                                Booked{" "}
-                                                {formatDate(session.created_at)}
-                                            </span>
-                                            <span>·</span>
-                                            <span>Price: ${session.price}</span>
-                                            {session.meeting_link && (
-                                                <>
-                                                    <span>·</span>
-                                                    <a
-                                                        href={
-                                                            session.meeting_link
-                                                        }
-                                                        className="text-primary underline"
-                                                        target="_blank"
-                                                        rel="noreferrer"
-                                                    >
-                                                        Meeting link
-                                                    </a>
-                                                </>
-                                            )}
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        )}
+                        <TutorSessionsList sessions={sessions} />
                     </CardContent>
                 </Card>
 
