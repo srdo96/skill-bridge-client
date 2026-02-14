@@ -77,7 +77,6 @@ function ActionsCell({ booking }: { booking: Booking }) {
         }
 
         const toastId = toast.loading("Submitting review...");
-        console.log("booking", booking);
 
         startTransition(() => {
             void (async () => {

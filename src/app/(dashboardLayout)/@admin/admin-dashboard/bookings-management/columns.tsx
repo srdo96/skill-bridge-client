@@ -28,12 +28,19 @@ function getStatusVariant(status: BookingStatus) {
     }
 }
 
+function shortId(id: string) {
+    if (id.length <= 14) return id;
+    return `${id.slice(0, 8)}...${id.slice(-8)}`;
+}
+
 export const columns: ColumnDef<Booking>[] = [
     {
         accessorKey: "booking_id",
         header: "Booking ID",
         cell: ({ row }) => (
-            <span className="font-mono text-xs">{row.original.booking_id}</span>
+            <span className="font-mono text-xs" title={row.original.booking_id}>
+                {shortId(row.original.booking_id)}
+            </span>
         ),
     },
     {

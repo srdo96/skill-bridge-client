@@ -168,9 +168,9 @@ export function LoginForm({
                             <FieldGroup>
                                 <Field>
                                     <Button type="submit">Login</Button>
-                                    <Button variant="outline" type="button">
+                                    {/* <Button variant="outline" type="button">
                                         Login with Google
-                                    </Button>
+                                    </Button> */}
                                     <FieldDescription className="px-6 text-center">
                                         Don't have an account?{" "}
                                         <Link

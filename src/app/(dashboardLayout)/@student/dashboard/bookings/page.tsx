@@ -1,7 +1,7 @@
+import { columns } from "@/app/(dashboardLayout)/@admin/admin-dashboard/bookings-management/columns";
+import { DataTable } from "@/app/(dashboardLayout)/@admin/admin-dashboard/bookings-management/data-table";
 import { bookingService } from "@/services/booking.service";
 import { Booking } from "@/types";
-import { DataTable } from "../../../@admin/admin-dashboard/bookings-management/data-table";
-import { columns } from "./columns";
 
 interface StudentBookingsPageProps {
     searchParams: Promise<{
@@ -70,6 +70,16 @@ export default async function StudentBookingsPage({
                         total: data.total,
                     }}
                 />
+                {/* <DataTable
+                    columns={columns}
+                    data={data.bookings}
+                    serverPagination={{
+                        page: data.page,
+                        limit: data.limit,
+                        totalPages: data.totalPages,
+                        total: data.total,
+                    }}
+                /> */}
             </div>
         </div>
     );
