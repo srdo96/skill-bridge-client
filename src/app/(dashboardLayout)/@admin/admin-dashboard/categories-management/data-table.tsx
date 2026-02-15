@@ -5,9 +5,11 @@ import {
     flexRender,
     getCoreRowModel,
     getPaginationRowModel,
+    PaginationState,
     useReactTable,
 } from "@tanstack/react-table";
-import { Fragment, useMemo, useState } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { Fragment, useEffect, useMemo, useState } from "react";
 
 import { DataTablePagination } from "@/components/layout/data-table-pagination";
 import {
@@ -23,6 +25,12 @@ import { Badge } from "@/components/ui/badge";
 interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[];
     data: TData[];
+    serverPagination?: {
+        page: number;
+        limit: number;
+        total: number;
+        totalPages: number;
+    };
 }
 
 // Context to share updateData function with cells
@@ -36,11 +44,39 @@ export type DataTableMeta<TData> = {
 export function DataTable<TData, TValue>({
     columns,
     data: initialData,
+    serverPagination,
 }: DataTableProps<TData, TValue>) {
+    const router = useRouter();
+    const pathname = usePathname();
+    const searchParams = useSearchParams();
+
     const [data, setData] = useState(initialData);
+    const [pagination, setPagination] = useState<PaginationState>({
+        pageIndex: Math.max((serverPagination?.page ?? 1) - 1, 0),
+        pageSize: serverPagination?.limit ?? 10,
+    });
     const [expandedRows, setExpandedRows] = useState<Set<string>>(
         () => new Set(),
     );
+    useEffect(() => {
+        setData(initialData);
+    }, [initialData]);
+
+    const handlePageChange = (page: number) => {
+        if (!serverPagination) return;
+        const params = new URLSearchParams(searchParams?.toString() ?? "");
+        params.set("page", String(page));
+        params.set("limit", String(serverPagination.limit));
+        router.push(`${pathname}?${params.toString()}`);
+    };
+
+    const handlePageSizeChange = (pageSize: number) => {
+        if (!serverPagination) return;
+        const params = new URLSearchParams(searchParams?.toString() ?? "");
+        params.set("page", "1");
+        params.set("limit", String(pageSize));
+        router.push(`${pathname}?${params.toString()}`);
+    };
 
     const toggleExpanded = (rowId: string) => {
         setExpandedRows((prev) => {
@@ -61,6 +97,10 @@ export function DataTable<TData, TValue>({
         columns,
         getCoreRowModel: getCoreRowModel(),
         getPaginationRowModel: getPaginationRowModel(),
+        onPaginationChange: setPagination,
+        state: {
+            pagination,
+        },
         meta: {
             updateData: (
                 rowIndex: number,
@@ -200,7 +240,16 @@ export function DataTable<TData, TValue>({
                     )}
                 </TableBody>
             </Table>
-            <DataTablePagination table={table} />
+            <DataTablePagination
+                table={table}
+                page={serverPagination?.page}
+                totalPages={serverPagination?.totalPages}
+                pageSize={serverPagination?.limit}
+                onPageChange={serverPagination ? handlePageChange : undefined}
+                onPageSizeChange={
+                    serverPagination ? handlePageSizeChange : undefined
+                }
+            />
         </div>
     );
 }

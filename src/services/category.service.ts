@@ -4,13 +4,17 @@ import { cookies } from "next/headers";
 const BACKEND_URL = env.BACKEND_URL;
 
 export const categoryService = {
-    getAllCategories: async function () {
+    getAllCategories: async function (queryString?: string) {
         try {
             const cookieStore = await cookies();
-            const res = await fetch(`${BACKEND_URL}/api/v1/categories`, {
-                headers: { Cookie: cookieStore.toString() },
-                cache: "no-cache",
-            });
+            const query = queryString ? `?${queryString}` : "";
+            const res = await fetch(
+                `${BACKEND_URL}/api/v1/categories${query}`,
+                {
+                    headers: { Cookie: cookieStore.toString() },
+                    cache: "no-cache",
+                },
+            );
             const data = await res.json();
             return { data, error: null };
         } catch (error) {

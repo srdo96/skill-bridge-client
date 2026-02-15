@@ -54,7 +54,6 @@ export default async function TutorsPage({ searchParams }: TutorsPageProps) {
                 <p className="text-sm text-muted-foreground">
                     Showing {tutors.length} tutors
                 </p>
-                <Button variant="outline">Sort by Rating</Button>
             </div>
 
             <div className="grid gap-6 md:grid-cols-2">
