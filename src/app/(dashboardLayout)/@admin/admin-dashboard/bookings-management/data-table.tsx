@@ -43,7 +43,6 @@ export function DataTable<TData, TValue>({
     data: initialData,
     serverPagination,
 }: DataTableProps<TData, TValue>) {
-    console.log("ini", initialData);
     const router = useRouter();
     const pathname = usePathname();
     const searchParams = useSearchParams();

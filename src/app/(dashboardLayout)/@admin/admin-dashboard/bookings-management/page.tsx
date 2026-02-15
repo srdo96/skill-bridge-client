@@ -46,6 +46,7 @@ export default async function page({ searchParams }: BookingsPageProps) {
     const page = Math.max(1, Number(pageParam) || 1);
     const limit = Math.max(1, Number(limitParam) || 10);
     const data = await getData(page, limit);
+
     return (
         <div>
             <DataTable

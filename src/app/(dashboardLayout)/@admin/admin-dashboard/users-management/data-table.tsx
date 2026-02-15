@@ -5,6 +5,7 @@ import {
     flexRender,
     getCoreRowModel,
     getPaginationRowModel,
+    PaginationState,
     useReactTable,
 } from "@tanstack/react-table";
 import { useEffect, useState } from "react";
@@ -18,10 +19,17 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/layout/table";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[];
     data: TData[];
+    serverPagination?: {
+        page: number;
+        limit: number;
+        total: number;
+        totalPages: number;
+    };
 }
 
 // Context to share updateData function with cells
@@ -33,17 +41,46 @@ export type DataTableMeta<TData> = {
 export function DataTable<TData, TValue>({
     columns,
     data: initialData,
+    serverPagination,
 }: DataTableProps<TData, TValue>) {
+    console.log("serverPagination", serverPagination);
+    const router = useRouter();
+    const pathname = usePathname();
+    const searchParams = useSearchParams();
     const [data, setData] = useState(initialData);
+    const [pagination, setPagination] = useState<PaginationState>({
+        pageIndex: 0,
+        pageSize: serverPagination?.limit ?? 10,
+    });
     useEffect(() => {
         setData(initialData);
     }, [initialData]);
+
+    const handlePageChange = (page: number) => {
+        if (!serverPagination) return;
+        const params = new URLSearchParams(searchParams?.toString() ?? "");
+        params.set("page", String(page));
+        params.set("limit", String(serverPagination.limit));
+        router.push(`${pathname}?${params.toString()}`);
+    };
+
+    const handlePageSizeChange = (pageSize: number) => {
+        if (!serverPagination) return;
+        const params = new URLSearchParams(searchParams?.toString() ?? "");
+        params.set("page", "1");
+        params.set("limit", String(pageSize));
+        router.push(`${pathname}?${params.toString()}`);
+    };
 
     const table = useReactTable({
         data,
         columns,
         getCoreRowModel: getCoreRowModel(),
         getPaginationRowModel: getPaginationRowModel(),
+        onPaginationChange: setPagination,
+        state: {
+            pagination,
+        },
         meta: {
             updateData: (
                 rowIndex: number,
@@ -129,7 +166,16 @@ export function DataTable<TData, TValue>({
                     )}
                 </TableBody>
             </Table>
-            <DataTablePagination table={table} />
+            <DataTablePagination
+                table={table}
+                page={serverPagination?.page}
+                totalPages={serverPagination?.totalPages}
+                pageSize={serverPagination?.limit}
+                onPageChange={serverPagination ? handlePageChange : undefined}
+                onPageSizeChange={
+                    serverPagination ? handlePageSizeChange : undefined
+                }
+            />
         </div>
     );
 }
