@@ -27,20 +27,22 @@ import { User } from "@/types";
 import { Hero } from "@/components/modules/homePage/hero";
 import { dashboardService } from "@/services/dashboard.service";
 
+export const dynamic = "force-dynamic";
+
 export default async function HomePage() {
     const { data } = await userService.getAllUser(
         "role=TUTOR&status=ACTIVE&tutorProfiles=true&isFeatured=true",
     );
-    console.log("tutors", data);
     const { data: stats } = await dashboardService.getHomePageStats();
 
     const featuredTutors: User[] = data?.data ?? [];
+    const statsData = stats?.data ?? {};
     const {
-        totalTutors,
-        totalSubjects,
-        totalSessionsCompleted,
-        totalStudents,
-    } = stats?.data;
+        totalTutors = 0,
+        totalSubjects = 0,
+        totalSessionsCompleted = 0,
+        totalStudents = 0,
+    } = statsData;
 
     return (
         <div>

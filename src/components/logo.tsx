@@ -19,7 +19,10 @@ interface LogoProps extends React.HTMLAttributes<HTMLAnchorElement> {
     children: React.ReactNode;
 }
 
-interface LogoImageProps extends React.ImgHTMLAttributes<HTMLImageElement> {
+interface LogoImageProps extends Omit<
+    React.ComponentProps<typeof Image>,
+    "src" | "alt" | "width" | "height"
+> {
     src: string;
     alt: string;
     className?: string;
