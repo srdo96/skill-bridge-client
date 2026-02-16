@@ -16,7 +16,7 @@ const nextConfig: NextConfig = {
 
         return [
             {
-                source: "/api/:path*",
+                source: "/api/auth/:path*",
                 destination: `${normalizedAuthBaseUrl}/api/auth/:path*`,
             },
         ];

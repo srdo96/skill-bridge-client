@@ -49,7 +49,7 @@ export function RegisterForm({ ...props }: React.ComponentProps<typeof Card>) {
             try {
                 const { data, error } = await authClient.signUp.email({
                     ...value,
-                    callbackURL: "http://localhost:3000/login",
+                    callbackURL: "/login",
                 });
 
                 if (error) {

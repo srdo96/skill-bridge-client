@@ -287,7 +287,7 @@ function SidebarTrigger({
             }}
             {...props}
         >
-            <PanelLeftIcon />
+            <PanelLeftIcon suppressHydrationWarning />
             <span className="sr-only">Toggle Sidebar</span>
         </Button>
     );
