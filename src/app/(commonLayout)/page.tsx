@@ -7,6 +7,8 @@ import {
     Search,
     Star,
     Users,
+    UsersRound,
+    UsersRoundIcon,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -70,12 +72,12 @@ export default async function HomePage() {
                             </span>
                         </div>
                         <div className="flex flex-col items-center gap-1 text-center">
-                            <Users className="h-6 w-6 text-primary" />
+                            <UsersRoundIcon className="h-6 w-6 text-primary" />
                             <span className="text-2xl font-bold">
                                 {totalStudents}+
                             </span>
                             <span className="text-sm text-muted-foreground">
-                                Active Tutors
+                                Active Students
                             </span>
                         </div>
                         <div className="flex flex-col items-center gap-1 text-center">
