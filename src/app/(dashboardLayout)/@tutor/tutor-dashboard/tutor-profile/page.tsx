@@ -1,11 +1,13 @@
+import { subjectService } from "@/services/subject.service";
 import { tutorProfileService } from "@/services/tutor-profile.service";
-import { TutorProfile } from "@/types";
+import { Availability, Subject, TutorProfile, TutorSubject } from "@/types";
 import { AlertTriangle } from "lucide-react";
+import { TutorAvailabilityForm } from "../tutor-availability/tutor-availability-form";
+import { TutorSubjectsForm } from "../tutor-subjects/tutor-subjects-form";
 import { TutorProfileForm } from "./tutor-profile-form";
 
 async function getProfile(): Promise<TutorProfile | null> {
     const { data, error } = await tutorProfileService.getMyTutorProfile();
-    console.log({ data, error });
     if (!data?.success) {
         return null;
     }
@@ -13,8 +15,21 @@ async function getProfile(): Promise<TutorProfile | null> {
     return data.data.tutorProfiles;
 }
 
+async function getSubjects(): Promise<Subject[]> {
+    const { data, error } = await subjectService.getAllSubjects();
+    if (error || !data) {
+        return [];
+    }
+    return data.data ?? data;
+}
+
 export default async function TutorProfilePage() {
-    const profile = await getProfile();
+    const [profile, subjects] = await Promise.all([
+        getProfile(),
+        getSubjects(),
+    ]);
+    const tutorSubjects: TutorSubject[] = profile?.tutorSubjects ?? [];
+    const availabilities: Availability[] = profile?.availabilities ?? [];
 
     return (
         <div className="space-y-6">
@@ -35,6 +50,25 @@ export default async function TutorProfilePage() {
             )}
 
             <TutorProfileForm initialProfile={profile} />
+
+            <div>
+                <h2 className="text-xl font-semibold">Add Subject</h2>
+                <p className="text-sm text-muted-foreground">
+                    Add or remove subjects you can teach.
+                </p>
+            </div>
+            <TutorSubjectsForm
+                subjects={subjects}
+                tutorSubjects={tutorSubjects}
+            />
+
+            <div>
+                <h2 className="text-xl font-semibold">Add Availability</h2>
+                <p className="text-sm text-muted-foreground">
+                    Add and manage your weekly availability schedule.
+                </p>
+            </div>
+            <TutorAvailabilityForm availabilities={availabilities} />
         </div>
     );
 }

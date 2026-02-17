@@ -1,7 +1,8 @@
-import { columns } from "@/app/(dashboardLayout)/@admin/admin-dashboard/bookings-management/columns";
+// import { columns } from "@/app/(dashboardLayout)/@admin/admin-dashboard/bookings-management/columns";
 import { DataTable } from "@/app/(dashboardLayout)/@admin/admin-dashboard/bookings-management/data-table";
 import { bookingService } from "@/services/booking.service";
 import { Booking } from "@/types";
+import { columns } from "./columns";
 
 interface StudentBookingsPageProps {
     searchParams: Promise<{
