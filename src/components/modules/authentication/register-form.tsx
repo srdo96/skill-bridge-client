@@ -248,13 +248,13 @@ export function RegisterForm({ ...props }: React.ComponentProps<typeof Card>) {
                                         ? "Creating account..."
                                         : "Create Account"}
                                 </Button>
-                                <Button
+                                {/* <Button
                                     variant="outline"
                                     type="button"
                                     disabled={isSubmitting}
                                 >
                                     Sign up with Google
-                                </Button>
+                                </Button> */}
                                 <FieldDescription className="px-6 text-center">
                                     Already have an account?{" "}
                                     <Link
