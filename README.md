@@ -3,6 +3,10 @@
 Frontend for the SkillBridge tutoring platform built with Next.js App Router.  
 It supports role-based experiences for `ADMIN`, `TUTOR`, and `STUDENT`, including booking management, tutor profile flows, and admin controls.
 
+## Live Demo
+
+- https://skill-bridge-client-kappa.vercel.app/
+
 ## Features
 
 - Role-based dashboards and navigation
